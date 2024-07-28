@@ -1,3 +1,4 @@
+import "./mainPage.css";
 
 // <수정사항>
 // 채팅 div에서 오른쪽 사이드바 나오게

@@ -120,7 +120,7 @@ html{
     float:right;
     margin-right:10px;
     margin-top:8px;
-    background-image: url('../media/mic-on.svg');
+    background-image: url('../../../public/images/media/mic-on.svg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -128,7 +128,7 @@ html{
 .sound{
     width:35px;
     height:35px;
-    background-image: url('../media/headphone-on.svg');
+    background-image: url('../../../public/images/media/headphone-on.svg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -142,7 +142,7 @@ html{
     margin-right:10px;
     float:right;
     margin-top:8px;
-    background-image: url('../media/mic-on.svg');
+    background-image: url('../../../public/images/media/mic-on.svg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -151,7 +151,7 @@ html{
 .plus{
     width:30px;
     height:30px;
-    background-image: url('../media/plus.svg');
+    background-image: url('../../../public/images/media/plus.svg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -162,7 +162,7 @@ html{
     width:30px;
     height:30px;
     margin-left:10px;
-    background-image: url('../media/gift.svg');
+    background-image: url('../../../public/images/media/gift.svg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -173,7 +173,7 @@ html{
     margin-left:10px;
     float:right;
     margin-right:10px;
-    background-image: url('../media/send.svg');
+    background-image: url('../../../public/images/media/send.svg');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
