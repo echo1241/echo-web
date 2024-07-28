@@ -1,10 +1,18 @@
 import "./intro.css";
 import { Link } from 'react-router-dom';
 
+
+
 function Intro() {
+    const cardStyle = {
+        '--clr': '#35343a',
+        display:'flex',
+        justifyContent:'center',
+        alignItems:'center'
+    }
 
     return (
-        <div className="card">
+        <div className="card" style={cardStyle}>
             <div className="circle">
                 <img src="images/echo.png" alt="" className="logo"/>
             </div>
