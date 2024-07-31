@@ -44,7 +44,7 @@ function Login() {
             navigate("/main");
         } catch (err) {
             // 로그인 실패 시 처리
-            setError(err.response.data.msg);
+            setError(err?.response?.data?.msg);
             console.error(err);
         }
     };
