@@ -1,10 +1,16 @@
 import axios from 'axios';
 
-const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8080', // Spring Boot 서버 주소
+export const instance = axios.create({
+    baseURL: process.env.REACT_APP_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
 
-export default axiosInstance;
+export const authenticationInstance = axios.create({
+    baseURL: process.env.REACT_APP_URL,
+    headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${sessionStorage.getItem("accessToken")}`
+    },
+});

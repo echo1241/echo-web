@@ -1,16 +1,34 @@
 import "./login.css";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from '../../api/auth';
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Popup from "../../component/modal/Popup";
 
 function Login() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [isPopupOpened, setIsPopupOpened] = useState(false);
     const [error, setError] = useState('');
+    const [isChecked, setIsChecked] = useState(false);
     const navigate = useNavigate(); // useNavigate 훅 사용
+
+    // useRef 변경
+    const emailRef = useRef(null);
+    const passwordRef = useRef(null);
+
+    useEffect(() => {
+        // 체크박스 관련 체킹
+        if (localStorage.getItem("email")) {
+            setIsChecked(true);
+            emailRef.current.value = localStorage.getItem("email");
+        }
+    }, [])
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        const email = emailRef.current.value;
+        const password = passwordRef.current.value;
+
+        emailLocalStorageSave(email);
+
         try {
             const response = await login(email, password);
             // 로그인 성공 시 처리
@@ -19,21 +37,40 @@ function Login() {
             // 응답에서 액세스 토큰과 리프레시 토큰을 추출
             const { accessToken, refreshToken } = response.data;
 
-            // 로컬 스토리지에 토큰 저장
-            localStorage.setItem("accessToken", accessToken);
-            localStorage.setItem("refreshToken", refreshToken);
+            sessionStorage.setItem("accessToken", accessToken);
+            sessionStorage.setItem("refreshToken", refreshToken);
 
             // 메인 페이지로 리다이렉트
             navigate("/main");
         } catch (err) {
             // 로그인 실패 시 처리
-            setError('Login failed. Please check your email and password.');
+            setError(err?.response?.data?.msg);
             console.error(err);
         }
     };
 
+    const emailLocalStorageSave = (email) => {
+        if (!isChecked) {
+            localStorage.removeItem("email");
+            return;
+        }
+        localStorage.setItem("email", email);
+    }
+
+    const checkItemHanlder = (e) => {
+        setIsChecked(!isChecked);
+    }
+
+    const openPopup = (e) => {
+        setIsPopupOpened(true);
+    }
+
     return (
         <div className="login">
+            {isPopupOpened && <Popup closePopup={() => setIsPopupOpened(false)}>
+                로그인에서 불러왔습니다.
+                <input type="email" required className="login__input" id="login-email" placeholder=" " />
+            </Popup>}
             <img src="images/login-bg.jpg" alt="login image" className="login__img"/>
 
             <form onSubmit={handleLogin} className="container">
@@ -44,7 +81,7 @@ function Login() {
                         <i className="ri-user-3-line login__icon"></i>
 
                         <div className="login__box-input">
-                            <input type="email" required className="login__input" id="login-email" placeholder=" " onChange={e => setEmail(e.target.value)} />
+                            <input ref={emailRef} type="email" required className="login__input" id="login-email" placeholder=" " />
                             <label htmlFor="login-email" className="login__label">Email</label>
                         </div>
                     </div>
@@ -53,7 +90,7 @@ function Login() {
                         <i className="ri-lock-2-line login__icon"></i>
 
                         <div className="login__box-input">
-                            <input type="password" required className="login__input" id="login-pass" placeholder=" " onChange={e => setPassword(e.target.value)} />
+                            <input ref={passwordRef} type="password" required className="login__input" id="login-pass" placeholder=" "/>
                             <label htmlFor="login-pass" className="login__label">Password</label>
                             <i className="ri-eye-off-line login__eye" id="login-eye"></i>
                         </div>
@@ -62,7 +99,7 @@ function Login() {
 
                 <div className="login__check">
                     <div className="login__check-group">
-                        <input type="checkbox" className="login__check-input" id="login-check" />
+                        <input type="checkbox" className="login__check-input" id="login-check" onChange={checkItemHanlder} checked={isChecked}/>
                         <label htmlFor="login-check" className="login__check-label">Remember me</label>
                     </div>
 
@@ -82,3 +119,4 @@ function Login() {
 }
 
 export default Login;
+
