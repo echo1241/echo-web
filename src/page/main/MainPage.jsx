@@ -1,29 +1,59 @@
-import "./mainPage.css";
-
-// <수정사항>
-// 채팅 div에서 오른쪽 사이드바 나오게
-//  할려면 위 아이콘 박스와 밑 채팅 박스를 나누어서
-//  사이드바 나오면 밑 채팅 넓이가 동적으로 동작하게?
-
-// <추가>
-// 검색바 처음에 돋보기 모양이였다가 텍스트 입력되면
-// 돋보기 모양이x로 바뀌게
-// 검색바 클릭시 길이 늘어나는거 할건가?
+import React, { useState } from 'react';
+import './mainPage.css';
+import Popup from "../../component/modal/Popup";
+import axios from 'axios';
+import {authenticationInstance} from "../../api/axios";  // axios를 임포트
 
 function MainPage() {
+    const [popupVisible, setPopupVisible] = useState(false);
+    const [name, setName] = useState('');
+    const [publicStatus, setPublicStatus] = useState('Y');
+
+    const handleAddClick = () => {
+        setPopupVisible(true);
+    };
+
+    const handleClosePopup = () => {
+        setPopupVisible(false);
+    };
+
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
+        try {
+            // API 호출
+            const response = await authenticationInstance().post("/spaces", {
+                spaceName: name,
+                isPublic: publicStatus,
+                thumbnail: null
+            });
+
+            // 성공적인 응답 처리
+            console.log('Space created:', response.data);
+            // 팝업 닫기
+            setPopupVisible(false);
+            // 입력 필드 초기화
+            setName('');
+            setPublicStatus('Y');
+        } catch (error) {
+            console.error('Error creating space:', error);
+            // 오류 처리
+        }
+    };
+
     return (
         <>
             <div className="social cell">
-                <div className="add"></div>
-                <div className="sound-img"></div>
+                <div className="add-wrap">
+                <div className="add" onClick={handleAddClick}>Add</div>
+                </div>
             </div>
             <div className="main cell">
                 <div className="sub">
                     <div className="voice cell">
-                        <hr className="line" />
+                        <hr className="line"/>
                         <div className="icon-box">
-                            <div className="profile cell">
-                            </div>
+                            <div className="profile cell"></div>
                             <div className="mic cell"></div>
                             <div className="sound cell"></div>
                             <div className="setting cell"></div>
@@ -37,14 +67,13 @@ function MainPage() {
                             </div>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
-                            {/* 검색 */}
                             <input type="search" className="top-icon"/>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
                         </div>
-                        <hr className="line" />
+                        <hr className="line"/>
                         <div className="send-chat">
                             <div className="plus icon cell"></div>
                             <div className="img icon cell"></div>
@@ -53,6 +82,36 @@ function MainPage() {
                     </div>
                 </div>
             </div>
+
+            {/* 팝업창 */}
+            {popupVisible && <Popup closePopup={() => setPopupVisible(false)}>
+                <h2>Enter Details</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label htmlFor="name">Name:</label>
+                        <input
+                            type="text"
+                            id="name"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="public">Public:</label>
+                        <select
+                            id="public"
+                            value={publicStatus}
+                            onChange={(e) => setPublicStatus(e.target.value)}
+                            required
+                        >
+                            <option value="Y">Yes</option>
+                            <option value="N">No</option>
+                        </select>
+                    </div>
+                    <button type="submit">Submit</button>
+                </form>
+            </Popup>}
         </>
     );
 }

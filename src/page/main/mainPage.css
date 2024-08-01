@@ -36,7 +36,9 @@ html{
     height:100%;
     display: flex;
     justify-content: center;
-    position:relative;
+}
+.add-wrap{
+    margin-top:50px;
 }
 .add{
     width:60px;
@@ -46,20 +48,12 @@ html{
     display:flex;
     justify-content:center;
     align-items: center;
-    margin-top:50px;
+    margin-top: 10px;
+
     transition: border-radius 0.3s;
 }
 .add:hover {
     border-radius:20px;
-}
-.sound-img{
-    width:20px;
-    height:20px;
-    background-color:blue;
-    position:absolute;
-    top:6%;
-    right:13%;
-    visibility:hidden; /* 방을 추가로 만들때 이 div가 원하는 위치에 생성되는지 확인, 음성 채팅에 사람 없으면 안보이다가 사람들 음성채팅에 들어오면 활성화*/
 }
 
 .main{
@@ -200,3 +194,62 @@ html{
 }
 
 /* 라이브러리 만들어서 반복되는 코드 줄이기*/
+.dropdown-content {
+    display: none;
+    position: absolute;
+    width: 100%;
+}
+
+.dropdown-item {
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f1f1f1;
+}
+
+.dropdown-item.active {
+    background-color: #ddd;
+}
+
+
+/* 제목 스타일 */
+.popup-content h2 {
+    color: #333; /* 텍스트 색상 변경 */
+    margin-top: 0;
+}
+
+/* 폼 그룹 */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333; /* 레이블 텍스트 색상 변경 */
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* 제출 버튼 */
+button {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #0056b3;
+}

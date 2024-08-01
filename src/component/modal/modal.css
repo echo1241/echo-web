@@ -19,3 +19,24 @@
     height: 100%;
     z-index: 999;
   }
+/* 팝업창 내용 */
+.popup-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 300px;
+    position: relative;
+}
+/* 닫기 버튼 */
+.close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    color: #333; /* 텍스트 색상 변경 */
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #007bff; /* 마우스 오버 시 색상 변경 */
+}

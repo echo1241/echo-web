@@ -7,7 +7,7 @@ export const instance = axios.create({
     },
 });
 
-export const authenticationInstance = axios.create({
+export const authenticationInstance = () => axios.create({
     baseURL: process.env.REACT_APP_URL,
     headers: {
     'Content-Type': 'application/json',
