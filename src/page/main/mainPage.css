@@ -52,6 +52,19 @@ html{
 
     transition: border-radius 0.3s;
 }
+.cir-btn{
+    width:60px;
+    height:60px;
+    background-color:green;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    margin-top: 10px;
+}
+.cir-btn > p{
+    text-align: center;
+}
 .add:hover {
     border-radius:20px;
 }

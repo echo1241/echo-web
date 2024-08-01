@@ -1,8 +1,9 @@
+// src/page/main/MainPage.jsx
 import React, { useState } from 'react';
 import './mainPage.css';
 import Popup from "../../component/modal/Popup";
-import axios from 'axios';
-import {authenticationInstance} from "../../api/axios";  // axios를 임포트
+import SpaceManager from '../../api/SpaceManager';
+import { authenticationInstance } from "../../api/axios";
 
 function MainPage() {
     const [popupVisible, setPopupVisible] = useState(false);
@@ -21,37 +22,33 @@ function MainPage() {
         event.preventDefault();
 
         try {
-            // API 호출
-            const response = await authenticationInstance().post("/spaces", {
+            await authenticationInstance().post("/spaces", {
                 spaceName: name,
                 isPublic: publicStatus,
                 thumbnail: null
             });
-
-            // 성공적인 응답 처리
-            console.log('Space created:', response.data);
-            // 팝업 닫기
+            const updatedResponse = await authenticationInstance().get("/spaces/public");
             setPopupVisible(false);
-            // 입력 필드 초기화
             setName('');
             setPublicStatus('Y');
         } catch (error) {
             console.error('Error creating space:', error);
-            // 오류 처리
         }
     };
 
     return (
         <>
             <div className="social cell">
-                <div className="add-wrap">
-                <div className="add" onClick={handleAddClick}>Add</div>
-                </div>
+                <SpaceManager
+                    onAddClick={handleAddClick}
+                    onSubmit={handleSubmit}
+                />
             </div>
+
             <div className="main cell">
                 <div className="sub">
                     <div className="voice cell">
-                        <hr className="line"/>
+                        <hr className="line" />
                         <div className="icon-box">
                             <div className="profile cell"></div>
                             <div className="mic cell"></div>
@@ -67,13 +64,13 @@ function MainPage() {
                             </div>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
-                            <input type="search" className="top-icon"/>
+                            <input type="search" className="top-icon" />
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
                         </div>
-                        <hr className="line"/>
+                        <hr className="line" />
                         <div className="send-chat">
                             <div className="plus icon cell"></div>
                             <div className="img icon cell"></div>
