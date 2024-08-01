@@ -1,39 +1,11 @@
 // src/page/main/MainPage.jsx
-import React, { useState } from 'react';
+import React from 'react';
 import './mainPage.css';
-import Popup from "../../component/modal/Popup";
 import SpaceManager from '../../api/SpaceManager';
-import { authenticationInstance } from "../../api/axios";
 
 function MainPage() {
-    const [popupVisible, setPopupVisible] = useState(false);
-    const [name, setName] = useState('');
-    const [publicStatus, setPublicStatus] = useState('Y');
-
     const handleAddClick = () => {
-        setPopupVisible(true);
-    };
-
-    const handleClosePopup = () => {
-        setPopupVisible(false);
-    };
-
-    const handleSubmit = async (event) => {
-        event.preventDefault();
-
-        try {
-            await authenticationInstance().post("/spaces", {
-                spaceName: name,
-                isPublic: publicStatus,
-                thumbnail: null
-            });
-            const updatedResponse = await authenticationInstance().get("/spaces/public");
-            setPopupVisible(false);
-            setName('');
-            setPublicStatus('Y');
-        } catch (error) {
-            console.error('Error creating space:', error);
-        }
+        // SpaceManager에서 처리하도록 팝업 열기 로직을 여기에 추가할 수 있습니다.
     };
 
     return (
@@ -41,7 +13,6 @@ function MainPage() {
             <div className="social cell">
                 <SpaceManager
                     onAddClick={handleAddClick}
-                    onSubmit={handleSubmit}
                 />
             </div>
 
@@ -79,36 +50,6 @@ function MainPage() {
                     </div>
                 </div>
             </div>
-
-            {/* 팝업창 */}
-            {popupVisible && <Popup closePopup={() => setPopupVisible(false)}>
-                <h2>Enter Details</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label htmlFor="name">Name:</label>
-                        <input
-                            type="text"
-                            id="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label htmlFor="public">Public:</label>
-                        <select
-                            id="public"
-                            value={publicStatus}
-                            onChange={(e) => setPublicStatus(e.target.value)}
-                            required
-                        >
-                            <option value="Y">Yes</option>
-                            <option value="N">No</option>
-                        </select>
-                    </div>
-                    <button type="submit">Submit</button>
-                </form>
-            </Popup>}
         </>
     );
 }
