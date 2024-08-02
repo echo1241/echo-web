@@ -1,4 +1,3 @@
-// src/page/main/MainPage.jsx
 import React from 'react';
 import './mainPage.css';
 import SpaceManager from '../../api/SpaceManager';
@@ -42,11 +41,21 @@ function MainPage() {
                             <div className="thread top-icon cell"></div>
                         </div>
                         <hr className="line" />
-                        <div className="send-chat">
-                            <div className="plus icon cell"></div>
-                            <div className="img icon cell"></div>
-                            <div className="send icon cell"></div>
+
+                        <div className="chat-box cell">
+                            <div id="messages-list">
+                                {/* 메시지 목록이 여기에 들어갑니다 */}
+                            </div>
                         </div>
+                        <div className="msg-wrap">
+                            <div className="send-chat">
+                                <div className="plus icon cell"></div>
+                                <div className="img icon cell"></div>
+                                <input type="text" className="chat-text" placeholder="메시지를 입력하세요..."/>
+                                <button className="send icon cell"></button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
             </div>
