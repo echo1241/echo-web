@@ -1,6 +1,7 @@
 import React from 'react';
 import './mainPage.css';
 import SpaceManager from '../../api/SpaceManager';
+import Text from '../../component/TextChat';
 
 function MainPage() {
     const handleAddClick = () => {
@@ -28,7 +29,9 @@ function MainPage() {
                     </div>
 
                     <div className="chat cell">
-                        <div className="top-box cell">
+                        <Text/>
+
+                        {/* <div className="top-box cell">
                             <div className="chat-names cell">
                                 <a className="chat-name">#</a>
                             </div>
@@ -44,17 +47,17 @@ function MainPage() {
 
                         <div className="chat-box cell">
                             <div id="messages-list">
-                                {/* 메시지 목록이 여기에 들어갑니다 */}
+                                {/* 메시지 목록이 여기에 들어갑니다 }
                             </div>
                         </div>
                         <div className="msg-wrap">
                             <div className="send-chat">
                                 <div className="plus icon cell"></div>
                                 <div className="img icon cell"></div>
-                                <input type="text" className="chat-text" placeholder="메시지를 입력하세요..."/>
+                                <input type="text" className="chat-text" placeholder="메시지를 입력하세요..." />
                                 <button className="send icon cell"></button>
                             </div>
-                        </div>
+                        </div> */}
 
                     </div>
                 </div>
