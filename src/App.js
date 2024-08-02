@@ -13,6 +13,7 @@ function App() {
   function TokenRedirector() {
     const navigate = useNavigate();
   
+    // 인증 관련 확인 API 추가해야됨?
     useEffect(() => {
       if (sessionStorage.getItem("accessToken")) {
         navigate("/main");

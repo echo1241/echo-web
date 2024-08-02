@@ -1,7 +1,7 @@
-// src/component/SpaceManager.jsx
 import React, { useState, useEffect } from 'react';
-import { authenticationInstance } from '../api/axios';  // axios 인스턴스 임포트
+import { authenticationInstance } from './axios';  // axios 인스턴스 임포트
 import Popup from '../component/modal/Popup';  // Popup 컴포넌트 임포트
+import './SpaceManager.css';  // CSS 파일 임포트
 
 const SpaceManager = ({ onAddClick }) => {
     const [spaces, setSpaces] = useState([]);  // 공간 목록 상태
@@ -46,12 +46,21 @@ const SpaceManager = ({ onAddClick }) => {
         }
     };
 
+    const handleSpaceClick = (id) => {
+        console.log('Selected Space ID:', id);  // 클릭된 스페이스 ID 콘솔 출력
+        onAddClick(id); // 부모 컴포넌트로 ID 전달
+    };
+
     return (
         <>
             <div className="add-wrap">
                 {/* 공간 목록 */}
                 {!loading && !error && spaces.map((space) => (
-                    <div key={space.id} className="cir-btn">
+                    <div
+                        key={space.id}
+                        className="cir-btn"
+                        onClick={() => handleSpaceClick(space.id)}
+                    >
                         <p>{space.spaceName}</p>
                     </div>
                 ))}

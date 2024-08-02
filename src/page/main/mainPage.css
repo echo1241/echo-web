@@ -300,3 +300,7 @@ button:hover {
     color: red;
     border: 1px solid rgba(128, 128, 128, 0.2);
 }
+
+.plus-button{
+    margin-top: 50px;
+}
