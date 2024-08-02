@@ -3,7 +3,10 @@ import SpaceManager from '../../api/SpaceManager';
 import ChannelManager from '../../api/ChannalManager'; // 이름 수정
 import './mainPage.css';
 import { authenticationInstance } from '../../api/axios';  // axios 인스턴스 임포트
-import Popup from '../../component/modal/Popup';// VideoCall 컴포넌트를 임포트합니다.
+import Popup from '../../component/modal/Popup';
+import VideoCall from "../videocall/VideoCall";
+
+// VideoCall 컴포넌트를 임포트합니다.
 
 function MainPage() {
     const [showAddButton, setShowAddButton] = useState(false); // 버튼의 가시성 상태
@@ -109,6 +112,7 @@ function MainPage() {
                         <hr className="line" />
 
                         <div className="chat-box cell">
+                            <VideoCall /> {/* VideoCall 컴포넌트를 추가합니다. */}
                             <div id="messages-list">
                                 {/* 메시지 목록이 여기에 들어갑니다 */}
                             </div>

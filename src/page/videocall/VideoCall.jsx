@@ -7,8 +7,8 @@ export const VideoCall = () => {
   let localStream;
   let muted = false;
   let cameraOff = false;
-  const peerConnections = {};
-  const processedStreams = new Set();
+  let peerConnections = {};
+  let processedStreams = new Set();
   const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
