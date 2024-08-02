@@ -99,11 +99,11 @@ function Login() {
 
                 <div className="login__check">
                     <div className="login__check-group">
-                        <input type="checkbox" className="login__check-input" id="login-check" onChange={checkItemHanlder} checked={isChecked}/>
+                        <input type="checkbox" className="login__check-input" id="login-check" />
                         <label htmlFor="login-check" className="login__check-label">Remember me</label>
                     </div>
 
-                    <a href="#" className="login__forgot">Forgot Password?</a>
+                    <Link to="/passwordfind" className="login__forgot">Forgot Password?</Link>
                 </div>
 
                 {error && <p className="login__error">{error}</p>}
@@ -119,4 +119,3 @@ function Login() {
 }
 
 export default Login;
-

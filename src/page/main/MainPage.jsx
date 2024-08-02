@@ -1,29 +1,27 @@
-import "./mainPage.css";
-
-// <수정사항>
-// 채팅 div에서 오른쪽 사이드바 나오게
-//  할려면 위 아이콘 박스와 밑 채팅 박스를 나누어서
-//  사이드바 나오면 밑 채팅 넓이가 동적으로 동작하게?
-
-// <추가>
-// 검색바 처음에 돋보기 모양이였다가 텍스트 입력되면
-// 돋보기 모양이x로 바뀌게
-// 검색바 클릭시 길이 늘어나는거 할건가?
+// src/page/main/MainPage.jsx
+import React from 'react';
+import './mainPage.css';
+import SpaceManager from '../../api/SpaceManager';
 
 function MainPage() {
+    const handleAddClick = () => {
+        // SpaceManager에서 처리하도록 팝업 열기 로직을 여기에 추가할 수 있습니다.
+    };
+
     return (
         <>
             <div className="social cell">
-                <div className="add"></div>
-                <div className="sound-img"></div>
+                <SpaceManager
+                    onAddClick={handleAddClick}
+                />
             </div>
+
             <div className="main cell">
                 <div className="sub">
                     <div className="voice cell">
                         <hr className="line" />
                         <div className="icon-box">
-                            <div className="profile cell">
-                            </div>
+                            <div className="profile cell"></div>
                             <div className="mic cell"></div>
                             <div className="sound cell"></div>
                             <div className="setting cell"></div>
@@ -37,8 +35,7 @@ function MainPage() {
                             </div>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
-                            {/* 검색 */}
-                            <input type="search" className="top-icon"/>
+                            <input type="search" className="top-icon" />
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>

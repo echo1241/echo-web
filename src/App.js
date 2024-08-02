@@ -6,6 +6,7 @@ import Login from './page/login/Login';
 import MainPage from './page/main/MainPage';
 import Signup from "./page/signup/Signup";
 import { useEffect } from 'react';
+import ForgotPassword from "./page/passwordfind/ForgotPassword";
 
 function App() {
   
@@ -30,6 +31,9 @@ function App() {
       <Route path="/login" element={<Login />}></Route>
       <Route path="/signup" element={<Signup />}></Route>
       <Route path="/main" element={<MainPage />}></Route>
+      <Route path="/passwordfind" element={<ForgotPassword/>}></Route>
+
+
     </Routes>
   </BrowserRouter>
   );

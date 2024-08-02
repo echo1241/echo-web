@@ -1,6 +1,6 @@
 import ModalPortal from "./Portal";
 import "./modal.css";
-import { useState } from "react";
+import React, { useState } from "react";
 
 function Popup({children, closePopup}) {
 
@@ -18,12 +18,15 @@ function Popup({children, closePopup}) {
     return (
         <ModalPortal id="modal">
             <div className="alert-wrap" onClick={handlePopupClick}>
-                <div id="content">
-                    {children}
+                <div className="popup-content">
+                    <span className="close" onClick={handlePopupClick}>&times;</span>
+                    <div id="content">
+                        {children}
+                    </div>
                 </div>
-            </div>
+                </div>
         </ModalPortal>
-    );
+);
 }
 
 export default Popup;
