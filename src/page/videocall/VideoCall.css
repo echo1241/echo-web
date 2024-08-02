@@ -15,7 +15,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: calc(100% - 150px); /* Adjust to fit other elements */
+  height: calc(100% - 150px);
   box-sizing: border-box;
 }
 

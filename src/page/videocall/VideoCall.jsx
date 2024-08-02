@@ -1,23 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './VideoCall.css';
 
-const VideoCall = () => {
-  const [socket, setSocket] = useState(null);
-  const [sessionId, setSessionId] = useState(null);
-  const [localStream, setLocalStream] = useState(null);
-  const [muted, setMuted] = useState(false);
-  const [cameraOff, setCameraOff] = useState(false);
-
+export const VideoCall = () => {
+  let socket;
+  let sessionId;
+  let localStream;
+  let muted = false;
+  let cameraOff = false;
   const peerConnections = {};
   const processedStreams = new Set();
+  const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
   const startCallBtnRef = useRef();
   const endCallBtnRef = useRef();
   const muteBtnRef = useRef();
   const cameraBtnRef = useRef();
-
-  const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
 
   const startCall = () => {
     const channelId = prompt("채널 ID를 입력하세요:", "1");
@@ -30,13 +28,14 @@ const VideoCall = () => {
     startCallBtnRef.current.disabled = true;
     endCallBtnRef.current.disabled = false;
 
-    const socket = new WebSocket(`ws://localhost:8080/api/video/${channelId}`);
-    socket.onopen = handleSocketOpen;
-    socket.onmessage = handleSocketMessage;
-    socket.onclose = handleSocketClose;
-    socket.onerror = handleSocketError;
+    const newSocket = new WebSocket(`ws://localhost:8080/api/video/${channelId}`);
+    console.log("socket1: ", socket);
+    newSocket.onopen = handleSocketOpen;
+    newSocket.onmessage = handleSocketMessage;
+    newSocket.onclose = handleSocketClose;
+    newSocket.onerror = handleSocketError;
 
-    setSocket(socket);
+    socket = newSocket;
   };
 
   const handleSocketOpen = () => {
@@ -44,7 +43,7 @@ const VideoCall = () => {
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then(stream => {
         console.log("LocalStream 설정");
-        setLocalStream(stream);
+        localStream = stream;
         localVideoRef.current.srcObject = stream;
         muteBtnRef.current.disabled = false;
         cameraBtnRef.current.disabled = false;
@@ -56,7 +55,7 @@ const VideoCall = () => {
   const handleSocketMessage = (event) => {
     const message = JSON.parse(event.data);
     if (message.sessionId) {
-      setSessionId(message.sessionId);
+      sessionId = message.sessionId;
       document.getElementById('localLabel').innerText = `Local: ${message.sessionId}`;
     } else if (message.join) {
       handleJoin(message.join);
@@ -98,23 +97,34 @@ const VideoCall = () => {
 
     if (localStream) {
       localStream.getTracks().forEach(track => track.stop());
-      setLocalStream(null);
+      localStream = null;
     }
 
     localVideoRef.current.srcObject = null;
-    setSessionId(null);
-    
-    processedStreams.clear();
+    sessionId = null;
+    processedStreams = new Set();
   };
 
   const handleMuteClick = () => {
     localStream.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
-    setMuted(!muted);
+    if (!muted) {
+      muteBtnRef.innerText = "Unmute";
+      muted = true;
+    } else {
+      muteBtnRef.innerText = "Mute";
+      muted = false;
+    }
   };
 
   const handleCameraClick = () => {
     localStream.getVideoTracks().forEach((track) => (track.enabled = !track.enabled));
-    setCameraOff(!cameraOff);
+    if (cameraOff) {
+      cameraBtnRef.innerText = "Turn Camera Off";
+      cameraOff = false;
+    } else {
+      cameraBtnRef.innerText = "Turn Camera On";
+      cameraOff = true;
+    }
   };
 
   const makePeerConnection = (id) => {
@@ -130,6 +140,7 @@ const VideoCall = () => {
 
     peerConnection.ontrack = event => {
       if (processedStreams.has(event.streams[0].id)) return;
+      // setProcessedStreams(prev => new Set(prev).add(event.streams[0].id));
       processedStreams.add(event.streams[0].id);
 
       const remoteVideoWrapper = document.createElement('div');
@@ -208,12 +219,13 @@ const VideoCall = () => {
     if (peerConnection) {
       console.log("RemoteVideo 종료: ", id);
       peerConnection.close();
+      delete peerConnections[id];
 
       const remoteVideoWrapper = document.querySelector(`.video-wrapper #remoteVideo_${id}`).parentNode;
       if (remoteVideoWrapper) {
         remoteVideoWrapper.remove();
       }
-      
+
       processedStreams.delete(id);
     }
   };
