@@ -18,23 +18,10 @@ export const signup = async (email, password, nickname) => {
 // 비밀번호 재설정 링크 전송
 export const sendPasswordResetEmail = async (email) => {
     try {
-        const response = await instance.post('/users/password', { email });
+        const response = await instance.post('/users/find/password', { email });
         return response.data;
     } catch (error) {
         throw new Error(error.response?.data?.error || 'Failed to send password reset email.');
-    }
-};
-
-// 비밀번호 재설정
-export const resetPassword = async (userId, currentPassword, newPassword) => {
-    try {
-        const response = await instance.put('/users/password', {
-            password: currentPassword,
-            newPassword
-        });
-        return response.data;
-    } catch (error) {
-        throw new Error(error.response?.data?.error || 'Failed to reset password.');
     }
 };
 
@@ -58,3 +45,21 @@ export const checkVerificationCode = async (code, email) => {
     });
     return response.data;
 }
+
+export const verifyVerificationCode = async (uuid, code) => {
+    const response = await instance.post(`/users/verify/${uuid}/${code}`)
+    return response.data;
+}
+
+// 비밀번호 재설정
+export const resetPassword = async (uuid, email, newPassword) => {
+    try {
+        const response = await instance.put(`/users/change/password/${uuid}`, {
+            email,
+            newPassword
+        });
+        return response.data;
+    } catch (error) {
+        throw new Error(error.response?.data?.error || 'Failed to reset password.');
+    }
+};
