@@ -59,8 +59,11 @@ const ChannelManager = ({ spaceId, onClose }) => {
         }
     };
 
-    const handleChannelClick = (channelId) => {
-        console.log('Channel ID:', channelId); // 채널 ID를 콘솔에 출력
+    const handleChannelClick = (channel) => {
+        console.log('Channel ID:', channel.id); // 채널 ID를 콘솔에 출력
+        console.log('Channel Name:', channel.channelName); // 채널 ID를 콘솔에 출력
+
+        // 해당 채널명을 부모창에 출력한다.
     };
 
     return (
@@ -76,15 +79,15 @@ const ChannelManager = ({ spaceId, onClose }) => {
                     <div key={channel.id} className="channel-item">
                         <button
                             className="channel-button"
-                            onClick={() => handleChannelClick(channel.id)}
+                            onClick={() => handleChannelClick(channel)}
                         >
                             {channel.channelName} ({channel.channelType === 'T' ? 'Text' : 'Voice'})
                         </button>
                         <button
-                            className="delete-button"
+                            className="channel-delete-button"
                             onClick={() => handleDeleteChannel(channel.id)}
                         >
-                            Delete
+                            X
                         </button>
                     </div>
                 ))}

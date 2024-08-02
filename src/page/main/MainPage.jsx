@@ -74,9 +74,9 @@ function MainPage() {
                     <div className="voice cell">
                         <hr className="line" />
                         {showAddButton && (
-                            <div className="plus-container" onClick={handlePlusButtonClick}>
-                                <span className="plus-text">Channel</span>
-                                <button className="plus-button">+</button>
+                            <div className="channel__plus-container" onClick={handlePlusButtonClick}>
+                                <span className="channel__plus-text">Channel</span>
+                                <button className="channel__plus-button">+</button>
                             </div>
                         )}
 

@@ -289,3 +289,13 @@ button:hover {
 .plus-button{
     margin-top: 50px;
 }
+
+.channel__plus-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.channel__plus-text {
+    margin-left: 12px;
+}
