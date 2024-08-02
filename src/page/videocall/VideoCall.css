@@ -1,0 +1,56 @@
+.video-call-container {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.video-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: calc(100% - 150px); /* Adjust to fit other elements */
+  box-sizing: border-box;
+}
+
+.video-wrapper {
+  position: relative;
+  margin: 10px;
+  text-align: center;
+  width: 440px;
+  height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+}
+
+.video-wrapper label {
+  position: relative;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 2px 5px;
+  margin-top: 5px;
+}
+
+.volume-control {
+  margin-top: 5px;
+  width: 100%;
+}
+
+.control-buttons {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
