@@ -64,7 +64,7 @@ function MainPage() {
     };
 
     return (
-        <>
+        <div className="main__wrap">
             <div className="social cell">
                 <SpaceManager onAddClick={handleAddClick} />
             </div>
@@ -170,7 +170,7 @@ function MainPage() {
                     </form>
                 </Popup>
             )}
-        </>
+        </div>
     );
 }
 
