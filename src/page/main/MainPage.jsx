@@ -3,7 +3,7 @@ import SpaceManager from '../../api/SpaceManager';
 import ChannelManager from '../../api/ChannalManager'; // 이름 수정
 import './mainPage.css';
 import { authenticationInstance } from '../../api/axios';  // axios 인스턴스 임포트
-import Popup from '../../component/modal/Popup';
+import Popup from '../../component/modal/Popup';// VideoCall 컴포넌트를 임포트합니다.
 
 function MainPage() {
     const [showAddButton, setShowAddButton] = useState(false); // 버튼의 가시성 상태
@@ -117,7 +117,7 @@ function MainPage() {
                             <div className="send-chat">
                                 <div className="plus icon cell"></div>
                                 <div className="img icon cell"></div>
-                                <input type="text" className="chat-text" placeholder="메시지를 입력하세요..."/>
+                                <input type="text" className="chat-text" placeholder="메시지를 입력하세요..." />
                                 <button className="send icon cell"></button>
                             </div>
                         </div>
