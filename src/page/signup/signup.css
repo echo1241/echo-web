@@ -126,6 +126,7 @@ img {
     font-weight: 500;
     cursor: pointer;
     margin-bottom: 2rem;
+    color: black;
 }
 
 .signup__login {
