@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { authenticationInstance } from '../api/axios';  // axios 인스턴스 임포트
+import { authenticationInstance } from './axios';  // axios 인스턴스 임포트
 import Popup from '../component/modal/Popup';  // Popup 컴포넌트 임포트
 import './SpaceManager.css';  // CSS 파일 임포트
 

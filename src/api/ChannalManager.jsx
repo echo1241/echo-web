@@ -59,6 +59,10 @@ const ChannelManager = ({ spaceId, onClose }) => {
         }
     };
 
+    const handleChannelClick = (channelId) => {
+        console.log('Channel ID:', channelId); // 채널 ID를 콘솔에 출력
+    };
+
     return (
         <div className="channel-manager">
             <h2>Channels</h2>
@@ -70,7 +74,10 @@ const ChannelManager = ({ spaceId, onClose }) => {
             <div className="channel-list">
                 {channels.map(channel => (
                     <div key={channel.id} className="channel-item">
-                        <button className="channel-button">
+                        <button
+                            className="channel-button"
+                            onClick={() => handleChannelClick(channel.id)}
+                        >
                             {channel.channelName} ({channel.channelType === 'T' ? 'Text' : 'Voice'})
                         </button>
                         <button
