@@ -44,9 +44,7 @@
     text-align: left;
     padding-right: 35px;
     width: 220px;
-    /* 채널명이 길면 메시지를 뚫고 나오는 이슈가 있음 */
-
-    /* 텍스트일 땐 텍스트 아이콘을 붙이고 싶은데? */
+    word-break: break-all;
 }
 
 .channel-delete-button {
