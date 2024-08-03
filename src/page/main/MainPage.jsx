@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SpaceManager from '../../api/SpaceManager';
 import ChannelManager from '../../api/ChannalManager'; // 이름 수정
 import './mainPage.css';
@@ -42,7 +42,7 @@ function MainPage() {
             // 요청할 데이터
             const payload = {
                 channelName,
-                channelType: channelType === 'text' ? 'T' : 'V'
+                channelType: channelType
             };
 
             // 백엔드 API 호출
@@ -72,13 +72,7 @@ function MainPage() {
             <div className="main cell">
                 <div className="sub">
                     <div className="voice cell">
-                        <hr className="line" />
-                        {showAddButton && (
-                            <div className="channel__plus-container" onClick={handlePlusButtonClick}>
-                                <h2 className="channel__plus-text">Channels</h2>
-                                <button className="channel__plus-button">+</button>
-                            </div>
-                        )}
+                        <hr className="line"></hr>
 
                         {/* 채널 매니저 컴포넌트 */}
                         {showChannelManager && (
@@ -124,52 +118,6 @@ function MainPage() {
                     </div>
                 </div>
             </div>
-
-            {/* 팝업창 */}
-            {popupVisible && (
-                <Popup closePopup={handlePopupClose}>
-                    <h2>Add Channel</h2>
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="channelName">Channel Name:</label>
-                            <input
-                                type="text"
-                                id="channelName"
-                                value={channelName}
-                                onChange={(e) => setChannelName(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Channel Type:</label>
-                            <div>
-                                <input
-                                    type="radio"
-                                    id="text"
-                                    name="channelType"
-                                    value="text"
-                                    checked={channelType === 'text'}
-                                    onChange={(e) => setChannelType(e.target.value)}
-                                />
-                                <label htmlFor="text">Text</label>
-                            </div>
-                            <div>
-                                <input
-                                    type="radio"
-                                    id="voice"
-                                    name="channelType"
-                                    value="voice"
-                                    checked={channelType === 'voice'}
-                                    onChange={(e) => setChannelType(e.target.value)}
-                                />
-                                <label htmlFor="voice">Voice</label>
-                            </div>
-                        </div>
-                        <button type="submit">Create Channel</button>
-                        {error && <p className="error">{error}</p>}
-                    </form>
-                </Popup>
-            )}
         </div>
     );
 }

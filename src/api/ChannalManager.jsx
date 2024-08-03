@@ -35,7 +35,7 @@ const ChannelManager = ({ spaceId, onClose }) => {
         try {
             const payload = {
                 channelName,
-                channelType: channelType === 'text' ? 'T' : 'V'
+                channelType: channelType
             };
 
             await authenticationInstance().post(`/spaces/${spaceId}/channels`, payload);
@@ -64,12 +64,27 @@ const ChannelManager = ({ spaceId, onClose }) => {
         console.log('Channel Name:', channel.channelName); // 채널 ID를 콘솔에 출력
 
         // 해당 채널명을 부모창에 출력한다.
+
     };
+
+    const handleChannelText = (e) => {
+        e.preventDefault();
+        console.log("channel text");
+        setChannelType('T');
+    }
+
+    const handleChannelVoice = (e) => {
+        e.preventDefault();
+        setChannelType('V');    
+    }
 
     return (
         <div className="channel-manager">
-            {/* <h2>Channels</h2> */}
-            {/* <button onClick={() => setPopupVisible(true)} className="add-button">Add Channel</button> */}
+            <div className="channel__plus-container">
+            <h2 className="channel__plus-text">Channels</h2>
+            <button className="channel__plus-button"
+            onClick={() => setPopupVisible(true)}>+</button>
+            </div>
 
             {/* 채널 목록 */}
             {loading && <p>Loading...</p>}
@@ -105,32 +120,19 @@ const ChannelManager = ({ spaceId, onClose }) => {
                                 id="channelName"
                                 value={channelName}
                                 onChange={(e) => setChannelName(e.target.value)}
-                                required
                             />
                         </div>
                         <div className="form-group">
                             <label>Channel Type:</label>
                             <div>
-                                <input
-                                    type="radio"
-                                    id="text"
-                                    name="channelType"
-                                    value="text"
-                                    checked={channelType === 'text'}
-                                    onChange={(e) => setChannelType(e.target.value)}
-                                />
-                                <label htmlFor="text">Text</label>
+                                <button 
+                                className= {channelType === 'T'? "channel-popup-add-button choice" : "channel-popup-add-button"}
+                                onClick={handleChannelText}>Text</button>
                             </div>
                             <div>
-                                <input
-                                    type="radio"
-                                    id="voice"
-                                    name="channelType"
-                                    value="voice"
-                                    checked={channelType === 'voice'}
-                                    onChange={(e) => setChannelType(e.target.value)}
-                                />
-                                <label htmlFor="voice">Voice</label>
+                                <button 
+                                className= {channelType === 'V'? "channel-popup-add-button choice" : "channel-popup-add-button"}
+                                onClick={handleChannelVoice}>voice</button>
                             </div>
                         </div>
                         <button type="submit">Create Channel</button>

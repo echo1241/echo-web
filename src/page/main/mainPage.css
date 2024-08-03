@@ -300,3 +300,19 @@ button:hover {
 .channel__plus-text {
     margin-left: 12px;
 }
+
+.channel-popup-add-button {
+    background-color: transparent;
+    width: 100%;
+    margin-top: 4px;
+    color: black;
+    border: 1px solid #ccc;
+}
+
+.choice{
+    background-color: #007bff;
+    width: 100%;
+    margin-top: 4px;
+    color: black;
+    border: 1px solid #ccc;
+}
