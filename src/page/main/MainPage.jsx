@@ -20,9 +20,20 @@ function MainPage() {
     const [textChatVisible, setTextChatVisible] = useState(false); // 텍스트 채팅 가시성 상태
     const [textChatChannelId, setTextChatChannelId] = useState(null); // 텍스트 채팅 채널 ID
 
-    const navigate = useNavigate();
+    const [user, setUser] = useState({});
 
+    const navigate = useNavigate();
     const { authenticationConnect } = useAxios();
+    
+    useEffect(() => {
+        const getUser = async () => {
+            const res = await authenticationConnect('get', '/users/profile');
+            console.log(res.data);
+            setUser(res.data);
+        }
+        getUser();
+    }, [])
+
 
     const handleAddClick = (id) => {
         setSpaceId(id); // 스페이스 ID 설정
@@ -128,7 +139,8 @@ function MainPage() {
 
                         <div className="chat-box cell">
                             {videoCallVisible && videoCallChannelId && (
-                                <VideoCall channelId={videoCallChannelId} />
+                                <VideoCall channelId={videoCallChannelId}
+                                user = {user} />
                             )}
 
                             {textChatVisible && < TextChat channelId={textChatChannelId} />}

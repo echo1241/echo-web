@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './VideoCall.css';
 
-export const VideoCall = ({ channelId }) => {
+export const VideoCall = ({ channelId, user }) => {
   let socket;
   let sessionId;
   let localStream;
@@ -12,6 +12,8 @@ export const VideoCall = ({ channelId }) => {
   const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
+
+  let remoteNickname;
 
   useEffect(() => {
     if (channelId) {
@@ -45,20 +47,22 @@ export const VideoCall = ({ channelId }) => {
         console.log("LocalStream 설정");
         localStream = stream;
         localVideoRef.current.srcObject = stream;
-        socket.send(JSON.stringify({ join: sessionId }));
+        socket.send(JSON.stringify({ join: sessionId, remoteNickname: user.nickname }));
       })
       .catch(error => console.error("Media Device 연결 오류: ", error));
   };
 
   const handleSocketMessage = (event) => {
     const message = JSON.parse(event.data);
+    console.log(message)
     if (message.sessionId) {
       sessionId = message.sessionId;
-      document.getElementById('localLabel').innerText = `Local: ${message.sessionId}`;
+      // document.getElementById('localLabel').innerText = `Local: ${message.sessionId}`;
+      document.getElementById('localLabel').innerText = `${user.nickname}`;
     } else if (message.join) {
-      handleJoin(message.join);
+      handleJoin(message.join, message.remoteNickname);
     } else if (message.offer) {
-      handleOffer(message.offer, message.from, message.to);
+      handleOffer(message.offer, message.from, message.to, message.fromNickname);
     } else if (message.answer) {
       handleAnswer(message.answer, message.from, message.to);
     } else if (message.iceCandidate) {
@@ -110,6 +114,9 @@ export const VideoCall = ({ channelId }) => {
     };
 
     peerConnection.ontrack = event => {
+      console.log("ontrack 발생");
+      console.log(remoteNickname);
+
       if (processedStreams.has(event.streams[0].id)) return;
       processedStreams.add(event.streams[0].id);
 
@@ -120,7 +127,7 @@ export const VideoCall = ({ channelId }) => {
       remoteVideo.autoplay = true;
       remoteVideoWrapper.append(remoteVideo);
       const label = document.createElement('label');
-      label.innerText = `Remote: ${id}`;
+      label.innerText = `${remoteNickname}`;
       remoteVideoWrapper.append(label);
       const volumeControl = document.createElement('input');
       volumeControl.type = 'range';
@@ -148,18 +155,20 @@ export const VideoCall = ({ channelId }) => {
     return peerConnection;
   };
 
-  const handleJoin = (id) => {
+  const handleJoin = (id, nickname) => {
     console.log("Offer 생성 및 LocalDescription 설정:", id);
+    remoteNickname = nickname;
     const peerConnection = makePeerConnection(id);
     peerConnection.createOffer()
       .then(offer => peerConnection.setLocalDescription(offer))
-      .then(() => socket.send(JSON.stringify({ offer: peerConnection.localDescription, from: sessionId, to: id })))
+      .then(() => socket.send(JSON.stringify({ offer: peerConnection.localDescription, from: sessionId, to: id, fromNickname: user.nickname })))
       .catch(error => console.error("Offer 생성 오류: ", error));
   };
 
-  const handleOffer = (offer, from, to) => {
+  const handleOffer = (offer, from, to, fromNickname) => {
     if (to !== sessionId) return;
     console.log("Offer 수신. from :", from, " to:", to);
+    remoteNickname = fromNickname;
     const peerConnection = makePeerConnection(from);
     peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
       .then(() => peerConnection.createAnswer())
