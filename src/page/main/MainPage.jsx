@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import SpaceManager from '../../api/SpaceManager';
 import ChannelManager from '../../api/ChannalManager';
 import './mainPage.css';
@@ -15,6 +16,16 @@ function MainPage() {
     const [showChannelManager, setShowChannelManager] = useState(false); // 채널 매니저 가시성 상태
     const [videoCallVisible, setVideoCallVisible] = useState(false); // 화상 통화 가시성 상태
     const [videoCallChannelId, setVideoCallChannelId] = useState(null); // 화상 통화 채널 ID
+
+    const navigate = useNavigate();
+
+
+    useEffect(() => {
+        // 세션 만료 시, 로그인으로 이동
+        if (!sessionStorage.getItem('accessToken')) {
+            navigate('/login');
+        }
+    }, [])
 
     const handleAddClick = (id) => {
         setSpaceId(id); // 스페이스 ID 설정
