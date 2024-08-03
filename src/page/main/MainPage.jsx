@@ -61,7 +61,12 @@ function MainPage() {
     const handleCloseChannelManager = () => {
         setShowChannelManager(false); // 채널 매니저 숨기기 설정
         setSpaceId(null); // 스페이스 ID 초기화
-    };
+    }
+
+    const handleChannelClick = (channel) => {
+        // 스페이스 명 변경
+        setChannelName(channel.channelName);
+    }
 
     return (
         <div className="main__wrap">
@@ -76,7 +81,11 @@ function MainPage() {
 
                         {/* 채널 매니저 컴포넌트 */}
                         {showChannelManager && (
-                            <ChannelManager spaceId={spaceId} onClose={handleCloseChannelManager} />
+                            <ChannelManager 
+                            spaceId={spaceId} 
+                            onClose={handleCloseChannelManager} 
+                            onClickChannel={handleChannelClick}
+                            />
                         )}
 
                         <div className="icon-box">
@@ -90,7 +99,8 @@ function MainPage() {
                     <div className="chat cell">
                         <div className="top-box cell">
                             <div className="chat-names cell">
-                                <a className="chat-name">#</a>
+                                <span className="chat-name">#</span>
+                                <span className="chat-name">{channelName}</span>
                             </div>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>

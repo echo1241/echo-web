@@ -3,7 +3,7 @@ import { authenticationInstance } from './axios';  // axios 인스턴스 임포�
 import Popup from '../component/modal/Popup';  // Popup 컴포넌트 임포트
 import './channelManager.css'; // CSS 파일 임포트
 
-const ChannelManager = ({ spaceId, onClose }) => {
+const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
     const [channels, setChannels] = useState([]);  // 채널 목록 상태
     const [loading, setLoading] = useState(true);  // 로딩 상태
     const [error, setError] = useState('');  // 오류 상태
@@ -63,8 +63,8 @@ const ChannelManager = ({ spaceId, onClose }) => {
         console.log('Channel ID:', channel.id); // 채널 ID를 콘솔에 출력
         console.log('Channel Name:', channel.channelName); // 채널 ID를 콘솔에 출력
 
-        // 해당 채널명을 부모창에 출력한다.
-
+        // 해당 채널 정보를 전달.
+        onClickChannel(channel);
     };
 
     const handleChannelText = (e) => {
