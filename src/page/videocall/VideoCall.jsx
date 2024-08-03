@@ -13,8 +13,8 @@ export const VideoCall = ({ channelId }) => {
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
   const endCallBtnRef = useRef();
-  const muteBtnRef = useRef();
-  const cameraBtnRef = useRef();
+  const muteBtn = document.getElementById("muteBtn");
+  const cameraBtn = document.getElementById("cameraBtn");
 
   useEffect(() => {
     if (channelId) {
@@ -43,8 +43,6 @@ export const VideoCall = ({ channelId }) => {
         console.log("LocalStream 설정");
         localStream = stream;
         localVideoRef.current.srcObject = stream;
-        muteBtnRef.current.disabled = false;
-        cameraBtnRef.current.disabled = false;
         socket.send(JSON.stringify({ join: sessionId }));
       })
       .catch(error => console.error("Media Device 연결 오류: ", error));
@@ -78,8 +76,8 @@ export const VideoCall = ({ channelId }) => {
 
   const endCall = () => {
     endCallBtnRef.current.disabled = true;
-    muteBtnRef.current.disabled = true;
-    cameraBtnRef.current.disabled = true;
+    muteBtn.current.disabled = true;
+    cameraBtn.current.disabled = true;
 
     Object.values(peerConnections).forEach(pc => pc.close());
     peerConnections = {};
@@ -104,12 +102,24 @@ export const VideoCall = ({ channelId }) => {
 
   const handleMuteClick = () => {
     localStream.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
-    muted = !muted;
+    if (!muted) {
+      document.getElementById("muteBtn").innerText = "Unmute";
+      muted = true;
+    } else {
+      document.getElementById("muteBtn").innerText = "Mute";
+      muted = false;
+    }
   };
 
   const handleCameraClick = () => {
     localStream.getVideoTracks().forEach((track) => (track.enabled = !track.enabled));
-    cameraOff = !cameraOff;
+    if (cameraOff) {
+      document.getElementById("cameraBtn").innerText = "Turn Camera Off";
+      cameraOff = false;
+    } else {
+      document.getElementById("cameraBtn").innerText = "Turn Camera On";
+      cameraOff = true;
+    }
   };
 
   const makePeerConnection = (id) => {
@@ -230,12 +240,8 @@ export const VideoCall = ({ channelId }) => {
         <video ref={localVideoRef} id="localVideo" autoPlay muted></video>
         <label id="localLabel">Local</label>
         <div className="control-buttons">
-          <button ref={muteBtnRef} className="btn btn-secondary" onClick={handleMuteClick}>
-            {muted ? "Unmute" : "Mute"}
-          </button>
-          <button ref={cameraBtnRef} className="btn btn-secondary" onClick={handleCameraClick}>
-            {cameraOff ? "Turn Camera On" : "Turn Camera Off"}
-          </button>
+          <button id="muteBtn" className="btn btn-secondary" onClick={handleMuteClick}>Mute</button>
+          <button id="cameraBtn" className="btn btn-secondary" onClick={handleCameraClick}>Turn Camera Off</button>
         </div>
       </div>
       <div id="videoContainer" className="video-container" ref={videoContainerRef}></div>
