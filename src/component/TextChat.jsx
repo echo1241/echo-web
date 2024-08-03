@@ -1,23 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
-export const EnterTextChannel = () => {
+export const EnterTextChannel = ({channelId}) => {
     const token = sessionStorage.getItem("accessToken");
-    const channelId = 1;
+    const [InputChannelId, setInputChannelId] = useState('');
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
     const [webSocket, setWebSocket] = useState(null);
+    const ws = useRef(null);
 
+    useEffect(() => {
+        if (channelId) {
+            // 메시지 리스트 초기화
+            if (messages) {
+                setMessages([]);
+            }
+            
+            connectWebSocket(channelId);
+        }
 
-    const connectWebSocket = () => {
+        return () => {
+            if (ws) {
+                ws.current.close();
+            }
+        };
+    }, [channelId]);
+
+    const connectWebSocket = (channelId) => {
+        if (webSocket !== null) {
+            return;
+        }
+
         if (token) {
-            const ws = new WebSocket(`ws://localhost:8080/api/text?channel=${channelId}&token=${token}`);
 
-            ws.onopen = () => {
+            const socket = new WebSocket(`ws://localhost:8080/api/text?channel=${channelId}&token=${token}`);
+
+            socket.onopen = () => {
                 console.log('WebSocket is connected');
 
             };
 
-            ws.onmessage = (event) => {
+            socket.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
                     setMessages(prevMessages => [...prevMessages, {
@@ -27,7 +49,6 @@ export const EnterTextChannel = () => {
                         timestamp: formatDate(new Date(data.createdAt)),
                         type: 'json'
                     }]);
-                    console.log('Received message : ', data);
                 } catch (e) {
                     console.log(new Date());
                     setMessages(prevMessages => [...prevMessages, {
@@ -35,19 +56,19 @@ export const EnterTextChannel = () => {
                         contents: event.data,
                         type: 'text'
                     }]);
-                    console.log('Received non-JSON message : ', event.data);
                 }
             };
 
-            ws.onclose = () => {
+            socket.onclose = () => {
                 console.log('WebSocket is disconnected');
             };
 
-            ws.onerror = (error) => {
+            socket.onerror = (error) => {
                 console.log('WebSocket error : ', error);
             };
 
-            setWebSocket(ws);
+            // setWebSocket(socket);
+            ws.current = socket;
         } else {
             console.error('Token is missing');
         }
@@ -58,11 +79,11 @@ export const EnterTextChannel = () => {
     };
 
     const handleSendMessage = () => {
-        if (webSocket && inputValue.trim()) {
+        if (ws.current && inputValue.trim()) {
             const data = {
                 contents: inputValue
             }
-            webSocket.send(JSON.stringify(data));
+            ws.current.send(JSON.stringify(data));
             setInputValue('');
         }
     };
