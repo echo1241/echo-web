@@ -36,10 +36,7 @@ async function sendAxiosRequest(method, uri, data, headers) {
         if (e?.response?.status === 401) {
             console.log("토큰이 만료되었습니다.");
             sessionStorage.clear();
-        }
-        // 에러 관련 메시지 리턴해준다.
-
-        // 에러 메시지는 data안에 있음 ex) res.data.msg
-        return e.response;
+        }        
+        throw e;
     }
 }

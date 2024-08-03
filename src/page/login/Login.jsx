@@ -1,9 +1,8 @@
 import "./login.css";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from '../../api/auth';
+import { login } from '../../api/api';
 import React, { useEffect, useRef, useState } from "react";
 import Popup from "../../component/modal/Popup";
-import { connect } from "../../util/axiosUtil";
 
 function Login() {
     const [isPopupOpened, setIsPopupOpened] = useState(false);
@@ -29,18 +28,23 @@ function Login() {
         const password = passwordRef.current.value;
 
         emailLocalStorageSave(email);
+        try {
+            const response = await login(email, password);
+            // 로그인 성공 시 처리
+            console.log('Login successful:', response);
 
-        const response = await login(email, password);
-
-        if (response?.status === 200){
+            // 응답에서 액세스 토큰과 리프레시 토큰을 추출
             const { accessToken, refreshToken } = response.data;
 
             sessionStorage.setItem("accessToken", accessToken);
             sessionStorage.setItem("refreshToken", refreshToken);
 
+            // 메인 페이지로 리다이렉트
             navigate("/main");
-        } else {
-            setError(response?.data?.msg)
+        } catch (err) {
+            // 로그인 실패 시 처리
+            setError(err?.response?.data?.msg);
+            console.error(err);
         }
     };
 

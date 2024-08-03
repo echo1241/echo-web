@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './ForgotPassword.css'; // 스타일 시트
 import { Link } from 'react-router-dom';
-import { sendPasswordResetEmail, resetPassword, verifyVerificationCode } from '../../api/auth'; // API 함수
+import { sendPasswordResetEmail, resetPassword, verifyVerificationCode } from '../../api/api'; // API 함수
 
 function ForgotPassword() {
     const [email, setEmail] = useState('');

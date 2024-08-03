@@ -1,7 +1,7 @@
 import "./signup.css";
 import {Link, useNavigate} from "react-router-dom";
 import { useRef, useState } from "react";
-import { checkDuplicateId, checkValidateEmail, checkVerificationCode, signup } from "../../api/auth";
+import { checkDuplicateId, checkValidateEmail, checkVerificationCode, signup } from "../../api/api";
 
 function Signup() {
     // useRef 추가
