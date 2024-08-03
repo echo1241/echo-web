@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-import SpaceManager from '../../api/SpaceManager';
-import Text from '../../component/TextChat';
-import ChannelManager from '../../api/ChannalManager';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import SpaceManager from '../../component/space/SpaceManager';
+import ChannelManager from '../../component/channel/ChannalManager';
 import './mainPage.css';
-import { authenticationInstance } from '../../api/axios';
-import VideoCall from "../videocall/VideoCall";
+import VideoCall from "../../component/videocall/VideoCall";
+import { useAxios } from '../../hook/useAxios';
 
 function MainPage() {
     const [showAddButton, setShowAddButton] = useState(false); // 버튼의 가시성 상태
@@ -16,6 +16,10 @@ function MainPage() {
     const [showChannelManager, setShowChannelManager] = useState(false); // 채널 매니저 가시성 상태
     const [videoCallVisible, setVideoCallVisible] = useState(false); // 화상 통화 가시성 상태
     const [videoCallChannelId, setVideoCallChannelId] = useState(null); // 화상 통화 채널 ID
+
+    const navigate = useNavigate();
+
+    const { authenticationConnect } = useAxios();
 
     const handleAddClick = (id) => {
         setSpaceId(id); // 스페이스 ID 설정
@@ -49,7 +53,7 @@ function MainPage() {
             };
 
             // 백엔드 API 호출
-            await authenticationInstance().post(`/spaces/${spaceId}/channels`, payload);
+            await authenticationConnect('post', `/spaces/${spaceId}/channels`, payload);
 
             // 성공 시 처리
             handlePopupClose(); // 팝업 닫기
