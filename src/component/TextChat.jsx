@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-export const EnterTextChannel = ({channelId}) => {
+export const EnterTextChannel = ({ channelId }) => {
     const token = sessionStorage.getItem("accessToken");
     const [InputChannelId, setInputChannelId] = useState('');
     const [messages, setMessages] = useState([]);
@@ -14,7 +14,7 @@ export const EnterTextChannel = ({channelId}) => {
             if (messages) {
                 setMessages([]);
             }
-            
+
             connectWebSocket(channelId);
         }
 
@@ -108,39 +108,23 @@ export const EnterTextChannel = ({channelId}) => {
 
     return (
         <>
-            <div className="top-box cell">
-                <div className="chat-names cell">
-                    <a className="chat-name">#</a>
-                </div>
-                <div className="thread top-icon cell"></div>
-                <div className="thread top-icon cell"></div>
-                <input type="search" className="top-icon" />
-                <div className="thread top-icon cell"></div>
-                <div className="thread top-icon cell"></div>
-                <div className="thread top-icon cell"></div>
-                <div className="thread top-icon cell"></div>
-            </div>
-            <hr className="line" />
-
-            <div className="chat-box cell">
-                <div id="messages-list">
-                    {messages.map((msg) => (
-                        <div key={msg.id} className={`message ${msg.type === 'json' ? 'json-message' : 'text-message'}`}>
-                            {msg.type === 'json' ? (
-                                <>
-                                    <p>
-                                        {msg.username}&nbsp;&nbsp;<span className="timestamp">({msg.timestamp})</span>
-                                    </p>
-                                    <p>{msg.contents}</p>
-                                </>
-                            ) : (
-                                <p>{msg.contents}&nbsp;&nbsp;<span className="timestamp">({msg.timestamp})</span>
+            <div id="messages-list">
+                {messages.map((msg) => (
+                    <div key={msg.id} className={`message ${msg.type === 'json' ? 'json-message' : 'text-message'}`}>
+                        {msg.type === 'json' ? (
+                            <>
+                                <p>
+                                    {msg.username}&nbsp;&nbsp;<span className="timestamp">({msg.timestamp})</span>
                                 </p>
-                            )}
-                            <hr className="message-line" />
-                        </div>
-                    ))}
-                </div>
+                                <p>{msg.contents}</p>
+                            </>
+                        ) : (
+                            <p>{msg.contents}&nbsp;&nbsp;<span className="timestamp">({msg.timestamp})</span>
+                            </p>
+                        )}
+                        <hr className="message-line" />
+                    </div>
+                ))}
             </div>
             <div className="msg-wrap">
                 <div className="send-chat">

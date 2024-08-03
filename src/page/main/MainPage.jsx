@@ -119,7 +119,28 @@ function MainPage() {
                     </div>
 
                     <div className="chat cell">
-                        {textChatVisible && < TextChat channelId={textChatChannelId} />}
+                        <div className="top-box cell">
+                            <div className="chat-names cell">
+                                <span className="chat-name">#</span>
+                            </div>
+                        </div>
+                        <hr className="line" />
+
+                        <div className="chat-box cell">
+                            {videoCallVisible && videoCallChannelId && (
+                                <VideoCall channelId={videoCallChannelId} />
+                            )}
+
+                            {textChatVisible && < TextChat channelId={textChatChannelId} />}
+                        </div>
+                        <div className="msg-wrap">
+                            <div className="send-chat">
+                                <div className="plus icon cell"></div>
+                                <div className="img icon cell"></div>
+                                <input type="text" className="chat-text" placeholder="메시지를 입력하세요..." />
+                                <button className="send icon cell"></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
