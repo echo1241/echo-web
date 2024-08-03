@@ -1,5 +1,5 @@
 .channel-manager {
-    padding: 20px;
+    padding: 10px;
     border-radius: 5px;
     position: relative;
 }
@@ -32,24 +32,34 @@
 .channel-item {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .channel-button {
-    background: #007bff;
+    background-color: transparent;
     color: white;
     border: none;
     border-radius: 3px;
-    padding: 5px 10px;
     cursor: pointer;
-    margin-right: 10px;
+    text-align: left;
+    padding-right: 35px;
+    width: 220px;
+    word-break: break-all;
 }
 
-.delete-button {
-    background: #dc3545;
+.channel-delete-button {
+    background: transparent;
     color: white;
     border: none;
     border-radius: 3px;
     padding: 5px 10px;
     cursor: pointer;
+}
+
+.channel__plus-button {
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: transparent;
 }

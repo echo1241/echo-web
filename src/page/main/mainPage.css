@@ -31,6 +31,10 @@ html{
 .line{
     margin-top:50px;
 }
+.main__wrap{
+    width: 100vw;
+    height: 100vh;
+}
 .social{
     width:5%;
     height:100%;
@@ -303,4 +307,31 @@ button:hover {
 
 .plus-button{
     margin-top: 50px;
+}
+
+.channel__plus-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+}
+
+.channel__plus-text {
+    margin-left: 12px;
+}
+
+.channel-popup-add-button {
+    background-color: transparent;
+    width: 100%;
+    margin-top: 4px;
+    color: black;
+    border: 1px solid #ccc;
+}
+
+.choice{
+    background-color: #007bff;
+    width: 100%;
+    margin-top: 4px;
+    color: black;
+    border: 1px solid #ccc;
 }

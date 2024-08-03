@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import SpaceManager from '../../api/SpaceManager';
 import Text from '../../component/TextChat';
-import ChannelManager from '../../api/ChannalManager'; // 이름 수정
+import ChannelManager from '../../api/ChannalManager';
 import './mainPage.css';
-import { authenticationInstance } from '../../api/axios';  // axios 인스턴스 임포트
-import Popup from '../../component/modal/Popup';// VideoCall 컴포넌트를 임포트합니다.
+import { authenticationInstance } from '../../api/axios';
+import VideoCall from "../videocall/VideoCall";
 
 function MainPage() {
     const [showAddButton, setShowAddButton] = useState(false); // 버튼의 가시성 상태
@@ -14,6 +14,8 @@ function MainPage() {
     const [spaceId, setSpaceId] = useState(null); // 선택된 스페이스 ID 상태
     const [error, setError] = useState(''); // 오류 상태
     const [showChannelManager, setShowChannelManager] = useState(false); // 채널 매니저 가시성 상태
+    const [videoCallVisible, setVideoCallVisible] = useState(false); // 화상 통화 가시성 상태
+    const [videoCallChannelId, setVideoCallChannelId] = useState(null); // 화상 통화 채널 ID
 
     const handleAddClick = (id) => {
         setSpaceId(id); // 스페이스 ID 설정
@@ -43,7 +45,7 @@ function MainPage() {
             // 요청할 데이터
             const payload = {
                 channelName,
-                channelType: channelType === 'text' ? 'T' : 'V'
+                channelType: channelType
             };
 
             // 백엔드 API 호출
@@ -64,8 +66,19 @@ function MainPage() {
         setSpaceId(null); // 스페이스 ID 초기화
     };
 
+    const handleChannelClick = (channel) => {
+        setChannelName(channel.channelName);
+        console.log(channel.channelType)
+
+        if (channel.channelType === 'V') {
+            // 화상 통화 채널 ID 설정 및 화상 통화 컴포넌트 표시
+            setVideoCallChannelId(channel.id);
+            setVideoCallVisible(true);
+        }
+    };
+
     return (
-        <>
+        <div className="main__wrap">
             <div className="social cell">
                 <SpaceManager onAddClick={handleAddClick} />
             </div>
@@ -73,17 +86,15 @@ function MainPage() {
             <div className="main cell">
                 <div className="sub">
                     <div className="voice cell">
-                        <hr className="line" />
-                        {showAddButton && (
-                            <div className="plus-container" onClick={handlePlusButtonClick}>
-                                <span className="plus-text">Channel</span>
-                                <button className="plus-button">+</button>
-                            </div>
-                        )}
+                        <hr className="line"></hr>
 
                         {/* 채널 매니저 컴포넌트 */}
                         {showChannelManager && (
-                            <ChannelManager spaceId={spaceId} onClose={handleCloseChannelManager} />
+                            <ChannelManager
+                                spaceId={spaceId}
+                                onClose={handleCloseChannelManager}
+                                onClickChannel={handleChannelClick}
+                            />
                         )}
 
                         <div className="icon-box">
@@ -99,19 +110,15 @@ function MainPage() {
 
                         {/* <div className="top-box cell">
                             <div className="chat-names cell">
-                                <a className="chat-name">#</a>
+                                <span className="chat-name">#</span>
                             </div>
-                            <div className="thread top-icon cell"></div>
-                            <div className="thread top-icon cell"></div>
-                            <input type="search" className="top-icon" />
-                            <div className="thread top-icon cell"></div>
-                            <div className="thread top-icon cell"></div>
-                            <div className="thread top-icon cell"></div>
-                            <div className="thread top-icon cell"></div>
                         </div>
                         <hr className="line" />
 
                         <div className="chat-box cell">
+                            {videoCallVisible && videoCallChannelId && (
+                                <VideoCall channelId={videoCallChannelId} />
+                            )}
                             <div id="messages-list">
                                 {/* 메시지 목록이 여기에 들어갑니다 }
                             </div>
@@ -129,53 +136,7 @@ function MainPage() {
                     </div>
                 </div>
             </div>
-
-            {/* 팝업창 */}
-            {popupVisible && (
-                <Popup closePopup={handlePopupClose}>
-                    <h2>Add Channel</h2>
-                    <form onSubmit={handleSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="channelName">Channel Name:</label>
-                            <input
-                                type="text"
-                                id="channelName"
-                                value={channelName}
-                                onChange={(e) => setChannelName(e.target.value)}
-                                required
-                            />
-                        </div>
-                        <div className="form-group">
-                            <label>Channel Type:</label>
-                            <div>
-                                <input
-                                    type="radio"
-                                    id="text"
-                                    name="channelType"
-                                    value="text"
-                                    checked={channelType === 'text'}
-                                    onChange={(e) => setChannelType(e.target.value)}
-                                />
-                                <label htmlFor="text">Text</label>
-                            </div>
-                            <div>
-                                <input
-                                    type="radio"
-                                    id="voice"
-                                    name="channelType"
-                                    value="voice"
-                                    checked={channelType === 'voice'}
-                                    onChange={(e) => setChannelType(e.target.value)}
-                                />
-                                <label htmlFor="voice">Voice</label>
-                            </div>
-                        </div>
-                        <button type="submit">Create Channel</button>
-                        {error && <p className="error">{error}</p>}
-                    </form>
-                </Popup>
-            )}
-        </>
+        </div>
     );
 }
 
