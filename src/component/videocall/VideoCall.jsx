@@ -5,17 +5,16 @@ export const VideoCall = ({ channelId }) => {
   let socket;
   let sessionId;
   let localStream;
-  let muted = false;
-  let cameraOff = false;
   let peerConnections = {};
   let processedStreams = new Set();
+  let muted = false;
+  let cameraOff = false;
   const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
-  const startCallBtnRef = useRef();
   const endCallBtnRef = useRef();
-  const muteBtnRef = useRef();
-  const cameraBtnRef = useRef();
+  const muteBtn = document.getElementById("muteBtn");
+  const cameraBtn = document.getElementById("cameraBtn");
 
   useEffect(() => {
     if (channelId) {
@@ -26,11 +25,9 @@ export const VideoCall = ({ channelId }) => {
   const startCall = () => {
     if (!channelId) return;
 
-    startCallBtnRef.current.disabled = true;
     endCallBtnRef.current.disabled = false;
 
     const newSocket = new WebSocket(`ws://localhost:8080/api/video/${channelId}`);
-    console.log("socket1: ", socket);
     newSocket.onopen = handleSocketOpen;
     newSocket.onmessage = handleSocketMessage;
     newSocket.onclose = handleSocketClose;
@@ -42,15 +39,13 @@ export const VideoCall = ({ channelId }) => {
   const handleSocketOpen = () => {
     console.log("WebSocket 연결");
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-        .then(stream => {
-          console.log("LocalStream 설정");
-          localStream = stream;
-          localVideoRef.current.srcObject = stream;
-          muteBtnRef.current.disabled = false;
-          cameraBtnRef.current.disabled = false;
-          socket.send(JSON.stringify({ join: sessionId }));
-        })
-        .catch(error => console.error("Media Device 연결 오류: ", error));
+      .then(stream => {
+        console.log("LocalStream 설정");
+        localStream = stream;
+        localVideoRef.current.srcObject = stream;
+        socket.send(JSON.stringify({ join: sessionId }));
+      })
+      .catch(error => console.error("Media Device 연결 오류: ", error));
   };
 
   const handleSocketMessage = (event) => {
@@ -80,10 +75,9 @@ export const VideoCall = ({ channelId }) => {
   };
 
   const endCall = () => {
-    startCallBtnRef.current.disabled = false;
     endCallBtnRef.current.disabled = true;
-    muteBtnRef.current.disabled = true;
-    cameraBtnRef.current.disabled = true;
+    muteBtn.current.disabled = true;
+    cameraBtn.current.disabled = true;
 
     Object.values(peerConnections).forEach(pc => pc.close());
     peerConnections = {};
@@ -109,10 +103,10 @@ export const VideoCall = ({ channelId }) => {
   const handleMuteClick = () => {
     localStream.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
     if (!muted) {
-      muteBtnRef.innerText = "Unmute";
+      document.getElementById("muteBtn").innerText = "Unmute";
       muted = true;
     } else {
-      muteBtnRef.innerText = "Mute";
+      document.getElementById("muteBtn").innerText = "Mute";
       muted = false;
     }
   };
@@ -120,10 +114,10 @@ export const VideoCall = ({ channelId }) => {
   const handleCameraClick = () => {
     localStream.getVideoTracks().forEach((track) => (track.enabled = !track.enabled));
     if (cameraOff) {
-      cameraBtnRef.innerText = "Turn Camera Off";
+      document.getElementById("cameraBtn").innerText = "Turn Camera Off";
       cameraOff = false;
     } else {
-      cameraBtnRef.innerText = "Turn Camera On";
+      document.getElementById("cameraBtn").innerText = "Turn Camera On";
       cameraOff = true;
     }
   };
@@ -182,9 +176,9 @@ export const VideoCall = ({ channelId }) => {
     console.log("Offer 생성 및 LocalDescription 설정:", id);
     const peerConnection = makePeerConnection(id);
     peerConnection.createOffer()
-        .then(offer => peerConnection.setLocalDescription(offer))
-        .then(() => socket.send(JSON.stringify({ offer: peerConnection.localDescription, from: sessionId, to: id })))
-        .catch(error => console.error("Offer 생성 오류: ", error));
+      .then(offer => peerConnection.setLocalDescription(offer))
+      .then(() => socket.send(JSON.stringify({ offer: peerConnection.localDescription, from: sessionId, to: id })))
+      .catch(error => console.error("Offer 생성 오류: ", error));
   };
 
   const handleOffer = (offer, from, to) => {
@@ -192,10 +186,10 @@ export const VideoCall = ({ channelId }) => {
     console.log("Offer 수신. from :", from, " to:", to);
     const peerConnection = makePeerConnection(from);
     peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
-        .then(() => peerConnection.createAnswer())
-        .then(answer => peerConnection.setLocalDescription(answer))
-        .then(() => socket.send(JSON.stringify({ answer: peerConnection.localDescription, from: sessionId, to: from })))
-        .catch(error => console.error("Offer 핸들링 오류: ", error));
+      .then(() => peerConnection.createAnswer())
+      .then(answer => peerConnection.setLocalDescription(answer))
+      .then(() => socket.send(JSON.stringify({ answer: peerConnection.localDescription, from: sessionId, to: from })))
+      .catch(error => console.error("Offer 핸들링 오류: ", error));
   };
 
   const handleAnswer = (answer, from, to) => {
@@ -203,7 +197,7 @@ export const VideoCall = ({ channelId }) => {
     console.log("Answer 수신. from :", from, " to:", to);
     const peerConnection = peerConnections[from];
     peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
-        .catch(error => console.error("RemoteDescription 오류: ", error));
+      .catch(error => console.error("RemoteDescription 오류: ", error));
   };
 
   const handleNewICECandidate = (candidate, from, to) => {
@@ -211,7 +205,7 @@ export const VideoCall = ({ channelId }) => {
     console.log("IceCandidate 수신. from :", from, " to:", to);
     const peerConnection = peerConnections[from];
     peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-        .catch(error => console.error("ICE 후보 추가 오류: ", error));
+      .catch(error => console.error("ICE 후보 추가 오류: ", error));
   };
 
   const handleLeave = (id) => {
@@ -235,30 +229,23 @@ export const VideoCall = ({ channelId }) => {
     video.volume = control.value;
   };
 
-  useEffect(() => {
-    if (localStream) {
-      muteBtnRef.current.innerText = muted ? "Unmute" : "Mute";
-      cameraBtnRef.current.innerText = cameraOff ? "Turn Camera On" : "Turn Camera Off";
-    }
-  }, [muted, cameraOff, localStream]);
-
   return (
-      <div className="video-call-container">
-        <h1 className="mb-4">Echo Video Call</h1>
-        <div className="button-container mb-4">
-          <button ref={startCallBtnRef} className="btn btn-primary" onClick={startCall}>Start Call</button>
-          <button ref={endCallBtnRef} className="btn btn-danger" onClick={endCall} disabled>End Call</button>
-        </div>
-        <div id="localContainer" className="video-wrapper">
-          <video ref={localVideoRef} id="localVideo" autoPlay muted></video>
-          <label id="localLabel">Local</label>
-          <div className="control-buttons">
-            <button ref={muteBtnRef} className="btn btn-secondary" onClick={handleMuteClick} disabled>Mute</button>
-            <button ref={cameraBtnRef} className="btn btn-secondary" onClick={handleCameraClick} disabled>Turn Camera Off</button>
-          </div>
-        </div>
-        <div id="videoContainer" className="video-container" ref={videoContainerRef}></div>
+    <div className="video-call-container">
+      {localStream}
+      <h1 className="mb-4">Echo Video Call</h1>
+      <div className="button-container mb-4">
+        <button ref={endCallBtnRef} className="btn btn-danger" onClick={endCall} disabled>End Call</button>
       </div>
+      <div id="localContainer" className="video-wrapper">
+        <video ref={localVideoRef} id="localVideo" autoPlay muted></video>
+        <label id="localLabel">Local</label>
+        <div className="control-buttons">
+          <button id="muteBtn" className="btn btn-secondary" onClick={handleMuteClick}>Mute</button>
+          <button id="cameraBtn" className="btn btn-secondary" onClick={handleCameraClick}>Turn Camera Off</button>
+        </div>
+      </div>
+      <div id="videoContainer" className="video-container" ref={videoContainerRef}></div>
+    </div>
   );
 };
 
