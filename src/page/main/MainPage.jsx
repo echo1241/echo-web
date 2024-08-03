@@ -1,12 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import SpaceManager from '../../api/SpaceManager';
-import ChannelManager from '../../api/ChannalManager'; // 이름 수정
+import ChannelManager from '../../api/ChannalManager';
 import './mainPage.css';
-import { authenticationInstance } from '../../api/axios';  // axios 인스턴스 임포트
-import Popup from '../../component/modal/Popup';
+import { authenticationInstance } from '../../api/axios';
 import VideoCall from "../videocall/VideoCall";
-
-// VideoCall 컴포넌트를 임포트합니다.
 
 function MainPage() {
     const [showAddButton, setShowAddButton] = useState(false); // 버튼의 가시성 상태
@@ -16,6 +13,8 @@ function MainPage() {
     const [spaceId, setSpaceId] = useState(null); // 선택된 스페이스 ID 상태
     const [error, setError] = useState(''); // 오류 상태
     const [showChannelManager, setShowChannelManager] = useState(false); // 채널 매니저 가시성 상태
+    const [videoCallVisible, setVideoCallVisible] = useState(false); // 화상 통화 가시성 상태
+    const [videoCallChannelId, setVideoCallChannelId] = useState(null); // 화상 통화 채널 ID
 
     const handleAddClick = (id) => {
         setSpaceId(id); // 스페이스 ID 설정
@@ -64,12 +63,18 @@ function MainPage() {
     const handleCloseChannelManager = () => {
         setShowChannelManager(false); // 채널 매니저 숨기기 설정
         setSpaceId(null); // 스페이스 ID 초기화
-    }
+    };
 
     const handleChannelClick = (channel) => {
-        // 스페이스 명 변경
         setChannelName(channel.channelName);
-    }
+        console.log(channel.channelType)
+
+        if (channel.channelType === 'V') {
+            // 화상 통화 채널 ID 설정 및 화상 통화 컴포넌트 표시
+            setVideoCallChannelId(channel.id);
+            setVideoCallVisible(true);
+        }
+    };
 
     return (
         <div className="main__wrap">
@@ -84,10 +89,10 @@ function MainPage() {
 
                         {/* 채널 매니저 컴포넌트 */}
                         {showChannelManager && (
-                            <ChannelManager 
-                            spaceId={spaceId} 
-                            onClose={handleCloseChannelManager} 
-                            onClickChannel={handleChannelClick}
+                            <ChannelManager
+                                spaceId={spaceId}
+                                onClose={handleCloseChannelManager}
+                                onClickChannel={handleChannelClick}
                             />
                         )}
 
@@ -103,21 +108,14 @@ function MainPage() {
                         <div className="top-box cell">
                             <div className="chat-names cell">
                                 <span className="chat-name">#</span>
-                                <span className="chat-name">{channelName}</span>
                             </div>
-                            {/* 미구현 기능으로 주석처리 */}
-                            {/* <div className="thread top-icon cell"></div>
-                            <div className="thread top-icon cell"></div>
-                            <input type="search" className="top-icon" />
-                            <div className="thread top-icon cell"></div>
-                            <div className="thread top-icon cell"></div>
-                            <div className="thread top-icon cell"></div>
-                            <div className="thread top-icon cell"></div> */}
                         </div>
                         <hr className="line" />
 
                         <div className="chat-box cell">
-                            <VideoCall /> {/* VideoCall 컴포넌트를 추가합니다. */}
+                            {videoCallVisible && videoCallChannelId && (
+                                <VideoCall channelId={videoCallChannelId} />
+                            )}
                             <div id="messages-list">
                                 {/* 메시지 목록이 여기에 들어갑니다 */}
                             </div>

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './VideoCall.css';
 
-export const VideoCall = () => {
+export const VideoCall = ({ channelId }) => {
   let socket;
   let sessionId;
   let localStream;
@@ -17,13 +17,14 @@ export const VideoCall = () => {
   const muteBtnRef = useRef();
   const cameraBtnRef = useRef();
 
-  const startCall = () => {
-    const channelId = prompt("채널 ID를 입력하세요:", "1");
-
-    if (!channelId) {
-      alert("화상 통화를 시작하려면 채널 ID를 입력하세요.");
-      return;
+  useEffect(() => {
+    if (channelId) {
+      startCall(); // 채널 ID가 있을 경우 화상 통화를 시작합니다.
     }
+  }, [channelId]);
+
+  const startCall = () => {
+    if (!channelId) return;
 
     startCallBtnRef.current.disabled = true;
     endCallBtnRef.current.disabled = false;
@@ -41,15 +42,15 @@ export const VideoCall = () => {
   const handleSocketOpen = () => {
     console.log("WebSocket 연결");
     navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-      .then(stream => {
-        console.log("LocalStream 설정");
-        localStream = stream;
-        localVideoRef.current.srcObject = stream;
-        muteBtnRef.current.disabled = false;
-        cameraBtnRef.current.disabled = false;
-        socket.send(JSON.stringify({ join: sessionId }));
-      })
-      .catch(error => console.error("Media Device 연결 오류: ", error));
+        .then(stream => {
+          console.log("LocalStream 설정");
+          localStream = stream;
+          localVideoRef.current.srcObject = stream;
+          muteBtnRef.current.disabled = false;
+          cameraBtnRef.current.disabled = false;
+          socket.send(JSON.stringify({ join: sessionId }));
+        })
+        .catch(error => console.error("Media Device 연결 오류: ", error));
   };
 
   const handleSocketMessage = (event) => {
@@ -140,7 +141,6 @@ export const VideoCall = () => {
 
     peerConnection.ontrack = event => {
       if (processedStreams.has(event.streams[0].id)) return;
-      // setProcessedStreams(prev => new Set(prev).add(event.streams[0].id));
       processedStreams.add(event.streams[0].id);
 
       const remoteVideoWrapper = document.createElement('div');
@@ -182,9 +182,9 @@ export const VideoCall = () => {
     console.log("Offer 생성 및 LocalDescription 설정:", id);
     const peerConnection = makePeerConnection(id);
     peerConnection.createOffer()
-      .then(offer => peerConnection.setLocalDescription(offer))
-      .then(() => socket.send(JSON.stringify({ offer: peerConnection.localDescription, from: sessionId, to: id })))
-      .catch(error => console.error("Offer 생성 오류: ", error));
+        .then(offer => peerConnection.setLocalDescription(offer))
+        .then(() => socket.send(JSON.stringify({ offer: peerConnection.localDescription, from: sessionId, to: id })))
+        .catch(error => console.error("Offer 생성 오류: ", error));
   };
 
   const handleOffer = (offer, from, to) => {
@@ -192,10 +192,10 @@ export const VideoCall = () => {
     console.log("Offer 수신. from :", from, " to:", to);
     const peerConnection = makePeerConnection(from);
     peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
-      .then(() => peerConnection.createAnswer())
-      .then(answer => peerConnection.setLocalDescription(answer))
-      .then(() => socket.send(JSON.stringify({ answer: peerConnection.localDescription, from: sessionId, to: from })))
-      .catch(error => console.error("Offer 핸들링 오류: ", error));
+        .then(() => peerConnection.createAnswer())
+        .then(answer => peerConnection.setLocalDescription(answer))
+        .then(() => socket.send(JSON.stringify({ answer: peerConnection.localDescription, from: sessionId, to: from })))
+        .catch(error => console.error("Offer 핸들링 오류: ", error));
   };
 
   const handleAnswer = (answer, from, to) => {
@@ -203,7 +203,7 @@ export const VideoCall = () => {
     console.log("Answer 수신. from :", from, " to:", to);
     const peerConnection = peerConnections[from];
     peerConnection.setRemoteDescription(new RTCSessionDescription(answer))
-      .catch(error => console.error("RemoteDescription 오류: ", error));
+        .catch(error => console.error("RemoteDescription 오류: ", error));
   };
 
   const handleNewICECandidate = (candidate, from, to) => {
@@ -211,7 +211,7 @@ export const VideoCall = () => {
     console.log("IceCandidate 수신. from :", from, " to:", to);
     const peerConnection = peerConnections[from];
     peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
-      .catch(error => console.error("ICE 후보 추가 오류: ", error));
+        .catch(error => console.error("ICE 후보 추가 오류: ", error));
   };
 
   const handleLeave = (id) => {
@@ -243,22 +243,22 @@ export const VideoCall = () => {
   }, [muted, cameraOff, localStream]);
 
   return (
-    <div className="video-call-container">
-      <h1 className="mb-4">Echo Video Call</h1>
-      <div className="button-container mb-4">
-        <button ref={startCallBtnRef} className="btn btn-primary" onClick={startCall}>Start Call</button>
-        <button ref={endCallBtnRef} className="btn btn-danger" onClick={endCall} disabled>End Call</button>
-      </div>
-      <div id="localContainer" className="video-wrapper">
-        <video ref={localVideoRef} id="localVideo" autoPlay muted></video>
-        <label id="localLabel">Local</label>
-        <div className="control-buttons">
-          <button ref={muteBtnRef} className="btn btn-secondary" onClick={handleMuteClick} disabled>Mute</button>
-          <button ref={cameraBtnRef} className="btn btn-secondary" onClick={handleCameraClick} disabled>Turn Camera Off</button>
+      <div className="video-call-container">
+        <h1 className="mb-4">Echo Video Call</h1>
+        <div className="button-container mb-4">
+          <button ref={startCallBtnRef} className="btn btn-primary" onClick={startCall}>Start Call</button>
+          <button ref={endCallBtnRef} className="btn btn-danger" onClick={endCall} disabled>End Call</button>
         </div>
+        <div id="localContainer" className="video-wrapper">
+          <video ref={localVideoRef} id="localVideo" autoPlay muted></video>
+          <label id="localLabel">Local</label>
+          <div className="control-buttons">
+            <button ref={muteBtnRef} className="btn btn-secondary" onClick={handleMuteClick} disabled>Mute</button>
+            <button ref={cameraBtnRef} className="btn btn-secondary" onClick={handleCameraClick} disabled>Turn Camera Off</button>
+          </div>
+        </div>
+        <div id="videoContainer" className="video-container" ref={videoContainerRef}></div>
       </div>
-      <div id="videoContainer" className="video-container" ref={videoContainerRef}></div>
-    </div>
   );
 };
 
