@@ -144,7 +144,7 @@ export const EnterTextChannel = ({channelId}) => {
             </div>
             <div className="msg-wrap">
                 <div className="send-chat">
-                    <div className="plus icon cell" onClick={connectWebSocket}></div>
+                    <div className="plus icon cell"></div>
                     <div className="img icon cell"></div>
                     <input type="text"
                         className="chat-text"
