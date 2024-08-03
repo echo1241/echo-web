@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import SpaceManager from '../../api/SpaceManager';
-import ChannelManager from '../../api/ChannalManager';
+import SpaceManager from '../../component/space/SpaceManager';
+import ChannelManager from '../../component/channel/ChannalManager';
 import './mainPage.css';
-import VideoCall from "../videocall/VideoCall";
+import VideoCall from "../../component/videocall/VideoCall";
 import { useAxios } from '../../hook/useAxios';
 
 function MainPage() {
