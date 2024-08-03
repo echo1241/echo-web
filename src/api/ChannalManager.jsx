@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { authenticationInstance } from './axios';  // axios 인스턴스 임포트
 import Popup from '../component/modal/Popup';  // Popup 컴포넌트 임포트
 import './channelManager.css'; // CSS 파일 임포트
+import { useAxios } from '../hook/useAxios';
 
 const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
     const [channels, setChannels] = useState([]);  // 채널 목록 상태
@@ -11,6 +12,8 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
     const [channelName, setChannelName] = useState('');  // 채널 이름 상태
     const [channelType, setChannelType] = useState('text');  // 채널 타입 상태
 
+    const { authenticationConnect } = useAxios();
+
     useEffect(() => {
         if (spaceId) {
             fetchChannels();
@@ -19,7 +22,8 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
 
     const fetchChannels = async () => {
         try {
-            const response = await authenticationInstance().get(`/spaces/${spaceId}/channels`);
+            const response = await authenticationConnect(
+                'get', `/spaces/${spaceId}/channels`);
             setChannels(response.data);
         } catch (error) {
             console.error('Error fetching channels:', error);
@@ -38,7 +42,7 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
                 channelType: channelType
             };
 
-            await authenticationInstance().post(`/spaces/${spaceId}/channels`, payload);
+            await authenticationConnect('post', `/spaces/${spaceId}/channels`, payload);
             fetchChannels();
             setPopupVisible(false);
             setChannelName('');
@@ -51,7 +55,7 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
 
     const handleDeleteChannel = async (channelId) => {
         try {
-            await authenticationInstance().delete(`/spaces/${spaceId}/channels/${channelId}`);
+            await authenticationConnect('delete', `/spaces/${spaceId}/channels/${channelId}`);
             fetchChannels();
         } catch (error) {
             console.error('Error deleting channel:', error);

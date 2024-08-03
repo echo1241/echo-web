@@ -3,12 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { login } from '../../api/api';
 import React, { useEffect, useRef, useState } from "react";
 import Popup from "../../component/modal/Popup";
+import { useAxios } from "../../hook/useAxios";
 
 function Login() {
     const [isPopupOpened, setIsPopupOpened] = useState(false);
     const [error, setError] = useState('');
     const [isChecked, setIsChecked] = useState(false);
     const navigate = useNavigate(); // useNavigate 훅 사용
+
+    const { connect } = useAxios();
 
     // useRef 변경
     const emailRef = useRef(null);
@@ -29,7 +32,7 @@ function Login() {
 
         emailLocalStorageSave(email);
         try {
-            const response = await login(email, password);
+            const response = await login(connect, email, password);
             // 로그인 성공 시 처리
             console.log('Login successful:', response);
 

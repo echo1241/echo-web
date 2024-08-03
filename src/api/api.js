@@ -1,7 +1,4 @@
-import { connect } from '../util/axiosUtil';
-import axiosInstance, {instance} from './axios';
-
-export const login = async (email, password) => {
+export const login = async (connect, email, password) => {
     return await connect('post', '/auth/login', {
         email,
         password,
@@ -11,7 +8,7 @@ export const login = async (email, password) => {
 //// 회원가입
 
 // 1. 아이디 중복 체크 (아이디 찾기에서도 사용)
-export const checkDuplicateId = async (email) => {
+export const checkDuplicateId = async (connect, email) => {
     const response = await connect('post', '/users/find/id', {
         email
     });
@@ -19,7 +16,7 @@ export const checkDuplicateId = async (email) => {
 }
 
 // 2. 이메일 인증 요청
-export const checkValidateEmail = async (email) => {
+export const checkValidateEmail = async (connect, email) => {
     const response = await connect('post', '/users/verify/email', {
         email
     });
@@ -27,7 +24,7 @@ export const checkValidateEmail = async (email) => {
 }
 
 // 3. 인증번호 확인
-export const checkVerificationCode = async (code, email) => {
+export const checkVerificationCode = async (connect, code, email) => {
     const response = await connect('post', `/users/verify/${code}`, {
         email
     });
@@ -35,7 +32,7 @@ export const checkVerificationCode = async (code, email) => {
 }
 
 // 4. 회원가입 완료
-export const signup = async (email, password, nickname) => {
+export const signup = async (connect, email, password, nickname) => {
     return await connect('post', '/users/signup', {
         email,
         password,
@@ -48,7 +45,7 @@ export const signup = async (email, password, nickname) => {
 // 아이디 & 비밀번호 찾기
 
 // 비밀번호 재설정 링크 전송
-export const sendPasswordResetEmail = async (email) => {
+export const sendPasswordResetEmail = async (connect, email) => {
     try {
         const response = await connect('post', '/users/find/password', { email });
         return response.data;
@@ -59,13 +56,13 @@ export const sendPasswordResetEmail = async (email) => {
 
 
 // 비밀번호 재설정 인증번호 요청
-export const verifyVerificationCode = async (uuid, code) => {
+export const verifyVerificationCode = async (connect, uuid, code) => {
     const response = await connect('post', `/users/verify/${uuid}/${code}`)
     return response.data;
 }
 
 // 비밀번호 재설정
-export const resetPassword = async (uuid, email, newPassword) => {
+export const resetPassword = async (connect, uuid, email, newPassword) => {
     try {
         const response = await connect('put', `/users/change/password/${uuid}`, {
             email,

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import SpaceManager from '../../api/SpaceManager';
 import ChannelManager from '../../api/ChannalManager';
 import './mainPage.css';
-import { authenticationInstance } from '../../api/axios';
 import VideoCall from "../videocall/VideoCall";
+import { useAxios } from '../../hook/useAxios';
 
 function MainPage() {
     const [showAddButton, setShowAddButton] = useState(false); // 버튼의 가시성 상태
@@ -19,13 +19,7 @@ function MainPage() {
 
     const navigate = useNavigate();
 
-
-    useEffect(() => {
-        // 세션 만료 시, 로그인으로 이동
-        if (!sessionStorage.getItem('accessToken')) {
-            navigate('/login');
-        }
-    }, [])
+    const { authenticationConnect } = useAxios();
 
     const handleAddClick = (id) => {
         setSpaceId(id); // 스페이스 ID 설정
@@ -59,7 +53,7 @@ function MainPage() {
             };
 
             // 백엔드 API 호출
-            await authenticationInstance().post(`/spaces/${spaceId}/channels`, payload);
+            await authenticationConnect('post', `/spaces/${spaceId}/channels`, payload);
 
             // 성공 시 처리
             handlePopupClose(); // 팝업 닫기
