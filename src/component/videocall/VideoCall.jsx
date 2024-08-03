@@ -12,20 +12,22 @@ export const VideoCall = ({ channelId }) => {
   const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
-  const endCallBtnRef = useRef();
-  const muteBtn = document.getElementById("muteBtn");
-  const cameraBtn = document.getElementById("cameraBtn");
 
   useEffect(() => {
     if (channelId) {
       startCall(); // 채널 ID가 있을 경우 화상 통화를 시작합니다.
     }
+    
+    return () => {
+      if (socket) {
+        socket.send(JSON.stringify({ leave: sessionId }));
+        socket.close();
+      }
+    };
   }, [channelId]);
 
   const startCall = () => {
     if (!channelId) return;
-
-    endCallBtnRef.current.disabled = false;
 
     const newSocket = new WebSocket(`ws://localhost:8080/api/video/${channelId}`);
     newSocket.onopen = handleSocketOpen;
@@ -72,32 +74,6 @@ export const VideoCall = ({ channelId }) => {
 
   const handleSocketError = (error) => {
     console.error("WebSocket 오류: ", error);
-  };
-
-  const endCall = () => {
-    endCallBtnRef.current.disabled = true;
-    muteBtn.current.disabled = true;
-    cameraBtn.current.disabled = true;
-
-    Object.values(peerConnections).forEach(pc => pc.close());
-    peerConnections = {};
-
-    const remoteVideos = videoContainerRef.current.querySelectorAll('.video-wrapper');
-    remoteVideos.forEach(videoWrapper => videoWrapper.remove());
-
-    if (socket) {
-      socket.send(JSON.stringify({ leave: sessionId }));
-      socket.close();
-    }
-
-    if (localStream) {
-      localStream.getTracks().forEach(track => track.stop());
-      localStream = null;
-    }
-
-    localVideoRef.current.srcObject = null;
-    sessionId = null;
-    processedStreams = new Set();
   };
 
   const handleMuteClick = () => {
@@ -234,7 +210,6 @@ export const VideoCall = ({ channelId }) => {
       {localStream}
       <h1 className="mb-4">Echo Video Call</h1>
       <div className="button-container mb-4">
-        <button ref={endCallBtnRef} className="btn btn-danger" onClick={endCall} disabled>End Call</button>
       </div>
       <div id="localContainer" className="video-wrapper">
         <video ref={localVideoRef} id="localVideo" autoPlay muted></video>
