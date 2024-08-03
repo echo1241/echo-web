@@ -102,13 +102,14 @@ function MainPage() {
                                 <span className="chat-name">#</span>
                                 <span className="chat-name">{channelName}</span>
                             </div>
-                            <div className="thread top-icon cell"></div>
+                            {/* 미구현 기능으로 주석처리 */}
+                            {/* <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
                             <input type="search" className="top-icon" />
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
                             <div className="thread top-icon cell"></div>
-                            <div className="thread top-icon cell"></div>
+                            <div className="thread top-icon cell"></div> */}
                         </div>
                         <hr className="line" />
 
