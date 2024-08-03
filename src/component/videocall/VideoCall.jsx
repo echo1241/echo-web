@@ -31,7 +31,8 @@ export const VideoCall = ({ channelId, user }) => {
   const startCall = () => {
     if (!channelId) return;
 
-    const newSocket = new WebSocket(`ws://localhost:8080/api/video/${channelId}`);
+    const host= process.env.REACT_APP_WS;
+    const newSocket = new WebSocket(`ws://${host}/video/${channelId}`);
     newSocket.onopen = handleSocketOpen;
     newSocket.onmessage = handleSocketMessage;
     newSocket.onclose = handleSocketClose;
