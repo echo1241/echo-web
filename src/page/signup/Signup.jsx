@@ -1,7 +1,8 @@
 import "./signup.css";
 import {Link, useNavigate} from "react-router-dom";
 import { useRef, useState } from "react";
-import { checkDuplicateId, checkValidateEmail, checkVerificationCode, signup } from "../../api/auth";
+import { checkDuplicateId, checkValidateEmail, checkVerificationCode, signup } from "../../api/api";
+import { useAxios } from "../../hook/useAxios";
 
 function Signup() {
     // useRef 추가
@@ -14,6 +15,8 @@ function Signup() {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    const { connect } = useAxios();
+
     const handleSignup = async (e) => {
         e.preventDefault();
         const email = emailRef.current.value;
@@ -21,7 +24,7 @@ function Signup() {
         const nickname = nicknameRef.current.value;
         
         try {
-            const response = await signup(email, password, nickname);
+            const response = await signup(connect, email, password, nickname);
             alert("회원가입이 완료되었습니다.");
             navigate("/login");
         } catch (e) {
@@ -39,12 +42,12 @@ function Signup() {
         // 이메일 중복 확인 시작,
 
         try {
-            const response = await checkDuplicateId(email);
+            const response = await checkDuplicateId(connect, email);
             setError(response?.msg);
             if (!response.find) {
                 // 중복된 아이디가 없는 것이므로
                 // 이메일 인증 요청을 날린다.
-                const response = await checkValidateEmail(email);
+                const response = await checkValidateEmail(connect, email);
                 // 이메일 인증 번호 입력
                 setError("인증 번호가 메일로 전송되었습니다. 10분 내로 입력해주세요.");
                 setIsDuplicated(false);
@@ -63,7 +66,7 @@ function Signup() {
         const email = emailRef.current.value;
         const code = codeRef.current.value;
         try{
-            const response = await checkVerificationCode(code, email);
+            const response = await checkVerificationCode(connect, code, email);
             setError(response);
             console.log(response);
             setIsDuplicated(true);
