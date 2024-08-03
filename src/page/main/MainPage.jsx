@@ -75,7 +75,7 @@ function MainPage() {
                         <hr className="line" />
                         {showAddButton && (
                             <div className="channel__plus-container" onClick={handlePlusButtonClick}>
-                                <span className="channel__plus-text">Channel</span>
+                                <h2 className="channel__plus-text">Channels</h2>
                                 <button className="channel__plus-button">+</button>
                             </div>
                         )}

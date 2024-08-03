@@ -68,8 +68,8 @@ const ChannelManager = ({ spaceId, onClose }) => {
 
     return (
         <div className="channel-manager">
-            <h2>Channels</h2>
-            <button onClick={() => setPopupVisible(true)} className="add-button">Add Channel</button>
+            {/* <h2>Channels</h2> */}
+            {/* <button onClick={() => setPopupVisible(true)} className="add-button">Add Channel</button> */}
 
             {/* 채널 목록 */}
             {loading && <p>Loading...</p>}
