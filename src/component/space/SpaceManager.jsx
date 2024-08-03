@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { authenticationInstance } from './axios';  // axios 인스턴스 임포트
-import Popup from '../component/modal/Popup';  // Popup 컴포넌트 임포트
+import Popup from '../modal/Popup';  // Popup 컴포넌트 임포트
 import './SpaceManager.css';  // CSS 파일 임포트
+import { useAxios } from '../../hook/useAxios';
 
 const SpaceManager = ({ onAddClick }) => {
     const [spaces, setSpaces] = useState([]);  // 공간 목록 상태
@@ -11,9 +11,11 @@ const SpaceManager = ({ onAddClick }) => {
     const [name, setName] = useState('');  // 공간 이름 상태
     const [publicStatus, setPublicStatus] = useState('Y');  // 공개 여부 상태
 
+    const { authenticationConnect } = useAxios();
+
     const fetchSpaces = async () => {
         try {
-            const response = await authenticationInstance().get("/spaces/public");
+            const response = await authenticationConnect('get', "/spaces/public");
             setSpaces(response.data);  // 상태 업데이트
         } catch (error) {
             console.error('Error fetching spaces:', error);
@@ -31,7 +33,7 @@ const SpaceManager = ({ onAddClick }) => {
         event.preventDefault();
 
         try {
-            await authenticationInstance().post("/spaces", {
+            await authenticationConnect("post", "/spaces", {
                 spaceName: name,
                 isPublic: publicStatus,
                 thumbnail: null

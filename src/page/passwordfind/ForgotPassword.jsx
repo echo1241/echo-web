@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './ForgotPassword.css'; // 스타일 시트
 import { Link } from 'react-router-dom';
-import { sendPasswordResetEmail, resetPassword, verifyVerificationCode } from '../../api/auth'; // API 함수
+import { sendPasswordResetEmail, resetPassword, verifyVerificationCode } from '../../api/api'; // API 함수
+import { useAxios } from '../../hook/useAxios';
 
 function ForgotPassword() {
     const [email, setEmail] = useState('');
@@ -21,6 +22,8 @@ function ForgotPassword() {
     const codeRef = useRef(null);
     const confirmPasswordRef = useRef(null);
 
+    const { connect } = useAxios();
+
     const handleSendResetLink = async (e) => {
         e.preventDefault();
         setUuid(null);
@@ -29,7 +32,7 @@ function ForgotPassword() {
 
         e.preventDefault();
         try {
-            const response = await sendPasswordResetEmail(email);
+            const response = await sendPasswordResetEmail(connect, email);
             console.log(response);
             setUuid(response);
             setMessage('해당 이메일로 인증번호 전송을 완료했습니다. 5분 이내에 입력해주세요.');
@@ -50,7 +53,7 @@ function ForgotPassword() {
         console.log(uuid);
         try {
             if (uuid) {
-                await verifyVerificationCode(uuid, code);
+                await verifyVerificationCode(connect, uuid, code);
                 setMessage('인증이 완료되었습니다.');
                 setError('');
                 setShowResetForm(true); // 비밀번호 재설정 폼 보이기
@@ -81,7 +84,7 @@ function ForgotPassword() {
 
         try {
             if (uuid) {
-                const response = await resetPassword(uuid, email, newPassword);
+                const response = await resetPassword(connect, uuid, email, newPassword);
                 setError('비밀번호 재설정이 완료되었습니다.');
                 console.log(response);
             } else {

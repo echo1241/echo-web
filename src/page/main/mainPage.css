@@ -104,6 +104,7 @@ html{
     height:100%;
     background-color:#313338;
     position:relative;
+
 }
 .send-chat{
     width:95%;
@@ -285,7 +286,25 @@ button:hover {
 .chat-box{
     width: 85%;
     height: 86%;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow: auto;
 }
+
+.timestamp{
+    font-size: 0.8em;
+}
+
+.message{
+    margin-left: 10px;
+}
+
+.message-line{
+    margin: 20px 0px 20px 0px;
+    color: red;
+    border: 1px solid rgba(128, 128, 128, 0.2);
+}
+
 .plus-button{
     margin-top: 50px;
 }
