@@ -12,7 +12,6 @@ export const VideoCall = ({ channelId, user }) => {
   const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
-  const [currentChannelId, setCurrentChannelId] = useState(null);
 
   let remoteNickname;
 
@@ -27,33 +26,35 @@ export const VideoCall = ({ channelId, user }) => {
     window.addEventListener('beforeunload', handleBeforeUnload);
 
     if (channelId) {
-      if (currentChannelId !== null && currentChannelId !== channelId) {
-        Object.values(peerConnections).forEach(pc => pc.close());
-        Object.keys(peerConnections).forEach(key => delete peerConnections[key]);
-
-        const remoteVideos = document.querySelectorAll(`[id^="remoteVideo_"]`);
-        remoteVideos.forEach(remoteVideo => {
-          const remoteVideoWrapper = remoteVideo.parentNode;
-          if (remoteVideoWrapper) {
-            remoteVideoWrapper.remove();
-          }
-        });
-
-        sessionId = null;
-        processedStreams.clear();
-      }
-
-      setCurrentChannelId(channelId);
       startCall();
     }
 
     return () => {
       if (socket) {
+        endCall();
         socket.send(JSON.stringify({ leave: sessionId }));
         socket.close();
       }
     };
   }, [channelId]);
+
+  const endCall = () => {
+    Object.values(peerConnections).forEach(pc => pc.close());
+    peerConnections = {};
+
+    if (videoContainerRef.current){
+      const remoteVideos = videoContainerRef.current.querySelectorAll('.video-wrapper');
+      remoteVideos.forEach(videoWrapper => videoWrapper.remove());
+
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+      }
+
+      localVideoRef.current.srcObject = null;
+      
+      processedStreams.clear();
+  }
+  };
 
   const startCall = () => {
     if (!channelId) return;
@@ -75,6 +76,7 @@ export const VideoCall = ({ channelId, user }) => {
         console.log("LocalStream 설정");
         localStream = stream;
         localVideoRef.current.srcObject = stream;
+        console.log(localStream);
         socket.send(JSON.stringify({ join: sessionId, remoteNickname: user.nickname }));
       })
       .catch(error => console.error("Media Device 연결 오류: ", error));
@@ -176,6 +178,7 @@ export const VideoCall = ({ channelId, user }) => {
       }
     };
 
+    console.log('ontrck localStream' + localStream);
     localStream.getTracks().forEach(track => peerConnection.addTrack(track, localStream));
 
     peerConnections[id] = peerConnection;
@@ -243,7 +246,6 @@ export const VideoCall = ({ channelId, user }) => {
 
   return (
     <div className="video-call-container">
-      {localStream}
       <h1 className="mb-4">Echo Video Call</h1>
       <div className="button-container mb-4">
       </div>

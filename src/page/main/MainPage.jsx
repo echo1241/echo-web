@@ -92,6 +92,7 @@ function MainPage() {
             // 화상 통화 채널 ID 설정 및 화상 통화 컴포넌트 표시
             setVideoCallChannelId(channel.id);
             setTextChatVisible(false);
+            setVideoCallVisible(false);
             setVideoCallVisible(true);
         } else if (channel.channelType === 'T') {
             // 텍스트 채널 ID 설정 및 웹소켓 개시
@@ -132,7 +133,7 @@ function MainPage() {
                     <div className="chat cell">
                         <div className="top-box cell">
                             <div className="chat-names cell">
-                                <span className="chat-name">#</span>
+                                <span className="chat-name"># {channelName}</span>
                             </div>
                         </div>
                         <hr className="line" />
