@@ -3,6 +3,7 @@ import './VideoCall.css';
 
 export const VideoCall = ({ channelId, user }) => {
   let socket;
+  let currentChannelId;
   let sessionId;
   let localStream;
   let peerConnections = {};
@@ -17,9 +18,26 @@ export const VideoCall = ({ channelId, user }) => {
 
   useEffect(() => {
     if (channelId) {
-      startCall(); // 채널 ID가 있을 경우 화상 통화를 시작합니다.
+      if (currentChannelId !== null && currentChannelId !== channelId) {
+        Object.values(peerConnections).forEach(pc => pc.close());
+        Object.keys(peerConnections).forEach(key => delete peerConnections[key]);
+
+        const remoteVideos = document.querySelectorAll(`[id^="remoteVideo_"]`);
+        remoteVideos.forEach(remoteVideo => {
+          const remoteVideoWrapper = remoteVideo.parentNode;
+          if (remoteVideoWrapper) {
+            remoteVideoWrapper.remove();
+          }
+        });
+
+        sessionId = null;
+        processedStreams.clear();
+      }
+
+      currentChannelId = channelId;
+      startCall();
     }
-    
+
     return () => {
       if (socket) {
         socket.send(JSON.stringify({ leave: sessionId }));
@@ -31,7 +49,7 @@ export const VideoCall = ({ channelId, user }) => {
   const startCall = () => {
     if (!channelId) return;
 
-    const host= process.env.REACT_APP_WS;
+    const host = process.env.REACT_APP_WS;
     const newSocket = new WebSocket(`ws://${host}/video/${channelId}`);
     newSocket.onopen = handleSocketOpen;
     newSocket.onmessage = handleSocketMessage;
@@ -58,7 +76,6 @@ export const VideoCall = ({ channelId, user }) => {
     console.log(message)
     if (message.sessionId) {
       sessionId = message.sessionId;
-      // document.getElementById('localLabel').innerText = `Local: ${message.sessionId}`;
       document.getElementById('localLabel').innerText = `${user.nickname}`;
     } else if (message.join) {
       handleJoin(message.join, message.remoteNickname);
