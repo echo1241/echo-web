@@ -14,8 +14,6 @@ export const VideoCall = ({ channelId, user }) => {
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
 
-  let remoteNickname;
-
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (socket) {
@@ -135,7 +133,7 @@ export const VideoCall = ({ channelId, user }) => {
     }
   };
 
-  const makePeerConnection = (id) => {
+  const makePeerConnection = (id, nickname) => {
     console.log("PeerConnection 생성. from:", id);
     const peerConnection = new RTCPeerConnection(configuration);
 
@@ -148,7 +146,6 @@ export const VideoCall = ({ channelId, user }) => {
 
     peerConnection.ontrack = event => {
       console.log("ontrack 발생");
-      console.log(remoteNickname);
 
       if (processedStreams.has(event.streams[0].id)) return;
       processedStreams.add(event.streams[0].id);
@@ -160,7 +157,7 @@ export const VideoCall = ({ channelId, user }) => {
       remoteVideo.autoplay = true;
       remoteVideoWrapper.append(remoteVideo);
       const label = document.createElement('label');
-      label.innerText = `${remoteNickname}`;
+      label.innerText = `${nickname}`;
       remoteVideoWrapper.append(label);
       const volumeControl = document.createElement('input');
       volumeControl.type = 'range';
@@ -191,8 +188,7 @@ export const VideoCall = ({ channelId, user }) => {
 
   const handleJoin = (id, nickname) => {
     console.log("Offer 생성 및 LocalDescription 설정:", id);
-    remoteNickname = nickname;
-    const peerConnection = makePeerConnection(id);
+    const peerConnection = makePeerConnection(id, nickname);
     peerConnection.createOffer()
       .then(offer => peerConnection.setLocalDescription(offer))
       .then(() => socket.send(JSON.stringify({ offer: peerConnection.localDescription, from: sessionId, to: id, fromNickname: user.nickname })))
@@ -202,8 +198,7 @@ export const VideoCall = ({ channelId, user }) => {
   const handleOffer = (offer, from, to, fromNickname) => {
     if (to !== sessionId) return;
     console.log("Offer 수신. from :", from, " to:", to);
-    remoteNickname = fromNickname;
-    const peerConnection = makePeerConnection(from);
+    const peerConnection = makePeerConnection(from, fromNickname);
     peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
       .then(() => peerConnection.createAnswer())
       .then(answer => peerConnection.setLocalDescription(answer))
