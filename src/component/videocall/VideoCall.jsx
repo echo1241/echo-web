@@ -3,7 +3,6 @@ import './VideoCall.css';
 
 export const VideoCall = ({ channelId, user }) => {
   let socket;
-  let currentChannelId;
   let sessionId;
   let localStream;
   let peerConnections = {};
@@ -13,10 +12,20 @@ export const VideoCall = ({ channelId, user }) => {
   const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
+  const [currentChannelId, setCurrentChannelId] = useState(null);
 
   let remoteNickname;
 
   useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (socket) {
+        socket.send(JSON.stringify({ leave: sessionId }));
+        socket.close();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     if (channelId) {
       if (currentChannelId !== null && currentChannelId !== channelId) {
         Object.values(peerConnections).forEach(pc => pc.close());
@@ -34,7 +43,7 @@ export const VideoCall = ({ channelId, user }) => {
         processedStreams.clear();
       }
 
-      currentChannelId = channelId;
+      setCurrentChannelId(channelId);
       startCall();
     }
 
