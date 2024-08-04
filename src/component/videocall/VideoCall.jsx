@@ -58,7 +58,7 @@ export const VideoCall = ({ channelId, user }) => {
   const startCall = () => {
     if (!channelId) return;
 
-    const host = process.env.REACT_APP_WS;
+    const host = process.env.REACT_APP_SERVER;
     const url = `ws://${host}/video/${channelId}`;
 
     const myWebSocket = new WebSocketApi(url, {

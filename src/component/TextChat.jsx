@@ -31,7 +31,7 @@ export const EnterTextChannel = ({ channelId }) => {
         }
 
         if (token) {
-            const host= process.env.REACT_APP_WS;
+            const host= process.env.REACT_APP_SERVER;
             const socket = new WebSocket(`ws://${host}/text?channel=${channelId}&token=${token}`);
 
             socket.onopen = () => {
