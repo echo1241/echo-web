@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { WebSocketApi } from '../../api/websocket';
 import './VideoCall.css';
 
 export const VideoCall = ({ channelId, user }) => {
@@ -60,13 +61,16 @@ export const VideoCall = ({ channelId, user }) => {
     if (!channelId) return;
 
     const host = process.env.REACT_APP_WS;
-    const newSocket = new WebSocket(`ws://${host}/video/${channelId}`);
-    newSocket.onopen = handleSocketOpen;
-    newSocket.onmessage = handleSocketMessage;
-    newSocket.onclose = handleSocketClose;
-    newSocket.onerror = handleSocketError;
+    const url = `ws://${host}/video/${channelId}`;
 
-    socket = newSocket;
+    const myWebSocket = new WebSocketApi(url, {
+      handleSocketOpen,
+      handleSocketMessage,
+      handleSocketClose,
+      handleSocketError
+    });
+
+    socket = myWebSocket.socket;
   };
 
   const handleSocketOpen = () => {
