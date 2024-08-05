@@ -4,10 +4,12 @@ import axios from 'axios';
 
 
 async function sendAxiosRequest(method, uri, data, headers, navigate) {
+    const protocol = process.env.REACT_APP_ISSECURE === 'true'? 'https://' : 'http://';
+
     try{
         return await axios({
             method: method,
-            url: process.env.REACT_APP_URL + uri,
+            url: protocol + process.env.REACT_APP_SERVER + uri,
             data: data,
             headers: headers
         });
