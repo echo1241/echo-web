@@ -51,6 +51,11 @@ function Login() {
         }
     };
 
+    const handleKakaoLogin = () => {
+        // 카카오 로그인 URL로 리다이렉트
+        window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=253310ea8bc3317d5e031006ac418c17&redirect_uri=http://localhost:3000/oauth/kakao/callback&response_type=code';
+    };
+
     const emailLocalStorageSave = (email) => {
         if (!isChecked) {
             localStorage.removeItem("email");
@@ -83,7 +88,8 @@ function Login() {
                         <i className="ri-user-3-line login__icon"></i>
 
                         <div className="login__box-input">
-                            <input ref={emailRef} type="email" required className="login__input" id="login-email" placeholder=" " />
+                            <input ref={emailRef} type="email" required className="login__input" id="login-email"
+                                   placeholder=" "/>
                             <label htmlFor="login-email" className="login__label">Email</label>
                         </div>
                     </div>
@@ -92,7 +98,8 @@ function Login() {
                         <i className="ri-lock-2-line login__icon"></i>
 
                         <div className="login__box-input">
-                            <input ref={passwordRef} type="password" required className="login__input" id="login-pass" placeholder=" "/>
+                            <input ref={passwordRef} type="password" required className="login__input" id="login-pass"
+                                   placeholder=" "/>
                             <label htmlFor="login-pass" className="login__label">Password</label>
                             <i className="ri-eye-off-line login__eye" id="login-eye"></i>
                         </div>
@@ -101,7 +108,7 @@ function Login() {
 
                 <div className="login__check">
                     <div className="login__check-group">
-                        <input type="checkbox" className="login__check-input" id="login-check" />
+                        <input type="checkbox" className="login__check-input" id="login-check"/>
                         <label htmlFor="login-check" className="login__check-label">Remember me</label>
                     </div>
 
@@ -111,6 +118,9 @@ function Login() {
                 {error && <p className="login__error">{error}</p>}
 
                 <button type="submit" className="login__button">Login</button>
+                <button type="button" className="login__button" onClick={handleKakaoLogin}>
+                    카카오로 로그인하기
+                </button>
 
                 <p className="login__register">
                     Don't have an account? <Link to="/signup">Register</Link>

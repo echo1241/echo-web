@@ -7,6 +7,7 @@ import MainPage from './page/main/MainPage';
 import Signup from "./page/signup/Signup";
 import { useEffect } from 'react';
 import ForgotPassword from "./page/passwordfind/ForgotPassword";
+import Oauth from "./page/oauth/Oauth";
 
 function App() {
   
@@ -33,6 +34,7 @@ function App() {
       <Route path="/signup" element={<Signup />}></Route>
       <Route path="/main" element={<MainPage />}></Route>
       <Route path="/passwordfind" element={<ForgotPassword/>}></Route>
+      <Route path="/oauth/kakao/callback" element={<Oauth/>}></Route>
 
 
     </Routes>
