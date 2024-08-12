@@ -6,6 +6,7 @@ import TextChat from '../../component/TextChat';
 import './mainPage.css';
 import VideoCall from "../../component/videocall/VideoCall";
 import { useAxios } from '../../hook/useAxios';
+import { EventSourceApi } from '../../api/sse';
 
 function MainPage() {
     const [showAddButton, setShowAddButton] = useState(false); // 버튼의 가시성 상태
@@ -22,7 +23,6 @@ function MainPage() {
 
     const [user, setUser] = useState({});
 
-    const navigate = useNavigate();
     const { authenticationConnect } = useAxios();
     
     useEffect(() => {
@@ -32,7 +32,24 @@ function MainPage() {
             setUser(res.data);
         }
         getUser();
+
+        // sse 연결
+        const host = process.env.REACT_APP_SERVER;
+        const url = `http://${host}/notice/sse/connect`;
+
+        const options = {
+            headers: {
+                "Authorization": `Bearer ${sessionStorage.getItem('accessToken')}`
+            }
+        }
+
+        new EventSourceApi(url, options, handleOnMessage);
     }, [])
+
+    const handleOnMessage = data => {
+        const message = data;
+        console.log(message);
+    }
 
 
     const handleAddClick = (id) => {
