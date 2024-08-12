@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { EventSourceApi } from '../../api/sse';
 import { useAxios } from '../../hook/useAxios';
 import Popup from '../modal/Popup';
 import './channelManager.css'; // CSS 파일 임포트
@@ -11,7 +12,28 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
     const [channelName, setChannelName] = useState('');  // 채널 이름 상태
     const [channelType, setChannelType] = useState('text');  // 채널 타입 상태
 
+    const eventSourceRef = useRef();
     const { authenticationConnect } = useAxios();
+
+
+    useEffect(() => {
+        // eventSoure 초기화
+        eventSourceRef.current = EventSourceApi.getInstance();
+        eventSourceRef.current.setOnMessage(handleOnMesaage);
+    }, []);
+
+    const handleOnMesaage = (event) => {
+
+        if (event.eventType === "CREATED") {
+            // 이전 데이터 
+            setChannels(prevChannels => [...prevChannels, event.data]);
+        } else if (event.eventType === "UPDATED") {
+            setChannels(prevChannels => prevChannels.map(channel => channel.id === event.data.id? event.data : channel));
+        } else if (event.eventType === "DELETED") {
+            setChannels(prevChannels => prevChannels.filter(channel => channel.id !== event.data.id));
+        }
+
+    }
 
     useEffect(() => {
         if (spaceId) {
@@ -23,6 +45,7 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
         try {
             const response = await authenticationConnect(
                 'get', `/spaces/${spaceId}/channels`);
+            console.log(response.data);
             setChannels(response.data);
         } catch (error) {
             console.error('Error fetching channels:', error);
@@ -99,7 +122,7 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
                             className="channel-button"
                             onClick={() => handleChannelClick(channel)}
                         >
-                            {channel.channelName} ({channel.channelType === 'T' ? 'Text' : 'Voice'})
+                            {channel.channelName} ({channel.channelType === 'T' ? 'Text' : 'Video'})
                         </button>
                         <button
                             className="channel-delete-button"
@@ -135,7 +158,7 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
                             <div>
                                 <button 
                                 className= {channelType === 'V'? "channel-popup-add-button choice" : "channel-popup-add-button"}
-                                onClick={handleChannelVoice}>voice</button>
+                                onClick={handleChannelVoice}>Video</button>
                             </div>
                         </div>
                         <button type="submit">Create Channel</button>
