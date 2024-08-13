@@ -2,55 +2,59 @@ import React, { useState, useEffect, useRef } from 'react';
 
 export const EnterTextChannel = ({ channelId }) => {
     const token = sessionStorage.getItem("accessToken");
-    const [InputChannelId, setInputChannelId] = useState('');
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
-    const [webSocket, setWebSocket] = useState(null);
+    const [typingUsers, setTypingUsers] = useState(new Set()); // 여러 사용자의 타이핑 상태를 관리
     const ws = useRef(null);
 
     useEffect(() => {
         if (channelId) {
-            // 메시지 리스트 초기화
-            if (messages) {
-                setMessages([]);
-            }
-
+            setMessages([]);
             connectWebSocket(channelId);
         }
 
         return () => {
-            if (ws) {
+            if (ws.current) {
                 ws.current.close();
             }
         };
     }, [channelId]);
 
     const connectWebSocket = (channelId) => {
-        if (webSocket !== null) {
+        if (ws.current) {
             return;
         }
 
         if (token) {
-            const host= process.env.REACT_APP_SERVER;
+            const host = process.env.REACT_APP_SERVER;
             const socket = new WebSocket(`ws://${host}/text?channel=${channelId}&token=${token}`);
 
             socket.onopen = () => {
                 console.log('WebSocket is connected');
-
             };
 
             socket.onmessage = (event) => {
                 try {
                     const data = JSON.parse(event.data);
-                    setMessages(prevMessages => [...prevMessages, {
-                        id: data.id,
-                        username: data.username,
-                        contents: data.contents,
-                        timestamp: formatDate(new Date(data.createdAt)),
-                        type: 'json'
-                    }]);
+                    if (data.typing) {
+                        setTypingUsers(prev => new Set(prev).add(data.username)); // 타이핑 중인 사용자 추가
+                    } else if (data.typing === false) {
+                        setTypingUsers(prev => {
+                            const updated = new Set(prev);
+                            updated.delete(data.username); // 타이핑 중지된 사용자 제거
+                            return updated;
+                        });
+                    }
+                    if (data.contents) {
+                        setMessages(prevMessages => [...prevMessages, {
+                            id: data.id,
+                            username: data.username,
+                            contents: data.contents,
+                            timestamp: formatDate(new Date(data.createdAt)),
+                            type: 'json'
+                        }]);
+                    }
                 } catch (e) {
-                    console.log(new Date());
                     setMessages(prevMessages => [...prevMessages, {
                         timestamp: formatDate(new Date()),
                         contents: event.data,
@@ -67,15 +71,29 @@ export const EnterTextChannel = ({ channelId }) => {
                 console.log('WebSocket error : ', error);
             };
 
-            // setWebSocket(socket);
             ws.current = socket;
         } else {
             console.error('Token is missing');
         }
-    }
+    };
 
     const handleInputChange = (event) => {
         setInputValue(event.target.value);
+
+        if (event.target.value.trim() === '') {
+            sendTypingStatus(false); // 입력이 비어있다면 타이핑 중지 메시지 전송
+        } else if (!typingUsers.has(token)) {
+            sendTypingStatus(true); // 입력이 시작되면 타이핑 중 메시지 전송
+        }
+    };
+
+    const sendTypingStatus = (isTyping) => {
+        if (ws.current) {
+            const data = {
+                typing: isTyping,
+            };
+            ws.current.send(JSON.stringify(data));
+        }
     };
 
     const handleSendMessage = () => {
@@ -85,6 +103,7 @@ export const EnterTextChannel = ({ channelId }) => {
             }
             ws.current.send(JSON.stringify(data));
             setInputValue('');
+            sendTypingStatus(false);
         }
     };
 
@@ -101,7 +120,7 @@ export const EnterTextChannel = ({ channelId }) => {
         const hours = date.getHours();
         const minutes = String(date.getMinutes()).padStart(2, '0');
         const ampm = hours >= 12 ? '오후' : '오전';
-        const adjustedHours = hours % 12 || 12; // 0시를 12시로 변환
+        const adjustedHours = hours % 12 || 12;
 
         return `${year}.${month}.${day}. ${ampm} ${adjustedHours}:${minutes}`;
     }
@@ -125,6 +144,11 @@ export const EnterTextChannel = ({ channelId }) => {
                         <hr className="message-line" />
                     </div>
                 ))}
+                {typingUsers.size > 0 && (
+                    <div className="typing-indicator">
+                        <p>{[...typingUsers].join(', ')}님이 입력 중입니다...</p>
+                    </div>
+                )}
             </div>
             <div className="msg-wrap">
                 <div className="send-chat">
@@ -141,8 +165,7 @@ export const EnterTextChannel = ({ channelId }) => {
                 </div>
             </div>
         </>
-    )
+    );
 };
 
 export default EnterTextChannel;
-
