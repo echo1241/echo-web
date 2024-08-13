@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SpaceManager from '../../component/space/SpaceManager';
 import ChannelManager from '../../component/channel/ChannalManager';
-import TextChat from '../../component/TextChat';
+import TextChat from '../../component/textchat/TextChat';
 import './mainPage.css';
 import VideoCall from "../../component/videocall/VideoCall";
 import { useAxios } from '../../hook/useAxios';
@@ -20,6 +20,7 @@ function MainPage() {
     const [videoCallChannelId, setVideoCallChannelId] = useState(null); // 화상 통화 채널 ID
     const [textChatVisible, setTextChatVisible] = useState(false); // 텍스트 채팅 가시성 상태
     const [textChatChannelId, setTextChatChannelId] = useState(null); // 텍스트 채팅 채널 ID
+    const [textChannelName, setTextChatChannelName] = useState(null); // 텍스트 채팅 채널 이름
 
     const [user, setUser] = useState({});
 
@@ -103,6 +104,8 @@ function MainPage() {
 
     const handleChannelClick = (channel) => {
         setChannelName(channel.channelName);
+        console.log('저장한 값', channel.channelName)
+        console.log('저장된 값', channelName)
         console.log(channel.channelType)
 
         if (channel.channelType === 'V') {
@@ -114,6 +117,7 @@ function MainPage() {
         } else if (channel.channelType === 'T') {
             // 텍스트 채널 ID 설정 및 웹소켓 개시
             setTextChatChannelId(channel.id);
+            console.log(textChatChannelId)
             setVideoCallVisible(false);
             setTextChatVisible(true);
         }
@@ -161,7 +165,7 @@ function MainPage() {
                                 user = {user} />
                             )}
 
-                            {textChatVisible && < TextChat channelId={textChatChannelId} />}
+                            {textChatVisible && < TextChat channelId={textChatChannelId} channelName={channelName} />}
                         </div>
                     </div>
                 </div>
