@@ -21,6 +21,7 @@ function MainPage() {
     const [videoCallChannelId, setVideoCallChannelId] = useState(null);
     const [textChatVisible, setTextChatVisible] = useState(false);
     const [textChatChannelId, setTextChatChannelId] = useState(null);
+    const [textChatDmId, setTextChatDmId] = useState(null); // DM ID 상태 추가
     const [dmVisible, setDmVisible] = useState(false);
     const [nicknamePopupVisible, setNicknamePopupVisible] = useState(false);
     const [nickname, setNickname] = useState('');
@@ -62,7 +63,7 @@ function MainPage() {
 
     const handleDmClick = async () => {
         setDmVisible(!dmVisible);
-            await fetchDmList(); // DM 목록 가져오기
+        await fetchDmList(); // DM 목록 가져오기
     };
 
     const fetchDmList = async () => {
@@ -111,7 +112,7 @@ function MainPage() {
 
     const handleChannelClick = (channel) => {
         setChannelName(channel.channelName);
-        console.log(channel.channelType)
+        console.log(channel.channelType);
 
         if (channel.channelType === 'V') {
             setVideoCallChannelId(channel.id);
@@ -123,6 +124,13 @@ function MainPage() {
             setVideoCallVisible(false);
             setTextChatVisible(true);
         }
+    };
+
+    const handleDmItemClick = (dmId) => {
+        setTextChatDmId(dmId); // DM ID 설정
+        setTextChatChannelId(null); // 채널 ID 초기화
+        setVideoCallVisible(false);
+        setTextChatVisible(true);
     };
 
     const handleNicknameSubmit = async (event) => {
@@ -170,7 +178,9 @@ function MainPage() {
                                 {dmList.length > 0 ? (
                                     <ul>
                                         {dmList.map(dm => (
-                                            <li key={dm.id}>{dm.nickname}</li>
+                                            <li key={dm.id} onClick={() => handleDmItemClick(dm.id)}>
+                                                {dm.nickname}
+                                            </li>
                                         ))}
                                     </ul>
                                 ) : (
@@ -220,22 +230,16 @@ function MainPage() {
                                 <span className="chat-name"># {channelName}</span>
                             </div>
                         </div>
-                        <hr className="line"/>
+                        <hr className="line" />
 
                         <div className="chat-box cell">
                             {videoCallVisible && videoCallChannelId && (
-                                <VideoCall channelId={videoCallChannelId} user={user}/>
+                                <VideoCall channelId={videoCallChannelId} user={user} />
                             )}
 
-                            {textChatVisible && <TextChat channelId={textChatChannelId}/>}
-                        </div>
-                        <div className="msg-wrap">
-                            <div className="send-chat">
-                                <div className="plus icon cell"></div>
-                                <div className="img icon cell"></div>
-                                <input type="text" className="chat-text" placeholder="메시지를 입력하세요..."/>
-                                <button className="send icon cell"></button>
-                            </div>
+                            {textChatVisible && (<TextChat channelId={textChatChannelId} dmId={textChatDmId} // DM ID 전달
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

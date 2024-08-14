@@ -1,42 +1,51 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-export const EnterTextChannel = ({ channelId }) => {
+export const EnterTextChannel = ({ channelId, dmId }) => {
     const token = sessionStorage.getItem("accessToken");
-    const [InputChannelId, setInputChannelId] = useState('');
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
-    const [webSocket, setWebSocket] = useState(null);
     const ws = useRef(null);
 
     useEffect(() => {
-        if (channelId) {
+        if (channelId || dmId) {
             // 메시지 리스트 초기화
-            if (messages) {
-                setMessages([]);
-            }
+            setMessages([]);
 
-            connectWebSocket(channelId);
+
+            // WebSocket 연결 설정
+            connectWebSocket(channelId, dmId);
         }
 
+        // 컴포넌트 언마운트 시 WebSocket 연결 종료
         return () => {
             if (ws) {
                 ws.current.close();
             }
         };
-    }, [channelId]);
+    }, [channelId, dmId]);
 
-    const connectWebSocket = (channelId) => {
-        if (webSocket !== null) {
-            return;
+    const connectWebSocket = (channelId, dmId) => {
+        if (ws.current) {
+            // 이전 WebSocket 연결이 있을 경우 종료
+            ws.current.close();
         }
 
         if (token) {
-            const host= process.env.REACT_APP_SERVER;
-            const socket = new WebSocket(`ws://${host}/text?channel=${channelId}&token=${token}`);
+            const host = process.env.REACT_APP_SERVER;
+            let url;
+
+            if (channelId) {
+                // 채널용 WebSocket URL
+                url = `ws://${host}/text?channel=${channelId}&token=${token}`;
+            } else if (dmId) {
+                // DM용 WebSocket URL
+                url = `ws://${host}/text?dmId=${dmId}&token=${token}`;
+            }
+
+            const socket = new WebSocket(url);
 
             socket.onopen = () => {
                 console.log('WebSocket is connected');
-
             };
 
             socket.onmessage = (event) => {
@@ -67,7 +76,6 @@ export const EnterTextChannel = ({ channelId }) => {
                 console.log('WebSocket error : ', error);
             };
 
-            // setWebSocket(socket);
             ws.current = socket;
         } else {
             console.error('Token is missing');
@@ -131,11 +139,11 @@ export const EnterTextChannel = ({ channelId }) => {
                     <div className="plus icon cell"></div>
                     <div className="img icon cell"></div>
                     <input type="text"
-                        className="chat-text"
-                        placeholder="메시지를 입력하세요..."
-                        value={inputValue}
-                        onChange={handleInputChange}
-                        onKeyDown={handleKeyPress}
+                           className="chat-text"
+                           placeholder="메시지를 입력하세요..."
+                           value={inputValue}
+                           onChange={handleInputChange}
+                           onKeyDown={handleKeyPress}
                     />
                     <button className="send icon cell" onClick={handleSendMessage}></button>
                 </div>
@@ -145,4 +153,3 @@ export const EnterTextChannel = ({ channelId }) => {
 };
 
 export default EnterTextChannel;
-
