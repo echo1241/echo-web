@@ -3,7 +3,7 @@ import { WebSocketApi } from '../../api/websocket';
 import { useAxios } from '../../hook/useAxios';
 import './textChat.css';  // CSS 파일 임포트
 
-export const EnterTextChannel = ({ spaceId, channelId, channelName, handleThread }) => {
+export const EnterTextChannel = ({ spaceId, channelId, channelName, handleThread, dmId }) => {
     const token = sessionStorage.getItem("accessToken");
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
@@ -13,18 +13,18 @@ export const EnterTextChannel = ({ spaceId, channelId, channelName, handleThread
     const [error, setError] = useState('');
     const [isChatTextDisabled, setIsChatTextDisabled] = useState(false);
     const messagesEndRef = useRef(null);
+    const [typingUsers, setTypingUsers] = useState(new Set()); // 여러 사용자의 타이핑 상태를 관리
     const fileRef = useRef(null);
     const ws = useRef(null);
 
     const { authenticationConnect } = useAxios();
 
     useEffect(() => {
-        if (channelId) {
-            // 메시지 리스트 초기화
-            if (messages) {
-                setMessages([]);
-            }
-            connectWebSocket(channelId);
+        if (channelId || dmId) {
+            setMessages([]);
+            setTypingUsers(new Set());
+            setInputValue('');
+            connectWebSocket(channelId, dmId);
         }
 
         return () => {
@@ -32,19 +32,29 @@ export const EnterTextChannel = ({ spaceId, channelId, channelName, handleThread
                 ws.current.close();
             }
         };
-    }, [channelId, channelName]);
+    }, [channelId, channelName, dmId]);
 
-    const connectWebSocket = (channelId) => {
+    const connectWebSocket = (channelId, dmId) => {
         if (webSocket !== null) {
             return;
         }
 
         if (token) {
             const host = process.env.REACT_APP_SERVER;
-            const socket = new WebSocket(`ws://${host}/text?channel=${channelId}&token=${token}`);
+            let url;
+
+            if (channelId) {
+                // 채널용 WebSocket URL
+                url = `ws://${host}/text?channel=${channelId}&token=${token}`;
+            } else if (dmId) {
+                // DM용 WebSocket URL
+                url = `ws://${host}/text?dmId=${dmId}&token=${token}`;
+            }
+
+            const socket = new WebSocket(url);
 
             socket.onopen = () => {
-                // console.log('WebSocket is connected');
+                 console.log('WebSocket is connected');
             };
 
             socket.onmessage = (event) => {

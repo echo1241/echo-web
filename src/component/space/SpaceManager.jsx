@@ -1,27 +1,30 @@
+// src/component/space/SpaceManager.jsx
 import React, { useState, useEffect } from 'react';
-import Popup from '../modal/Popup';  // Popup 컴포넌트 임포트
-import './SpaceManager.css';  // CSS 파일 임포트
+import Popup from '../modal/Popup';
+import Joinspace from '../../page/joinspace/Joinspace'; // 올바른 경로로 수정
+import './SpaceManager.css';
 import { useAxios } from '../../hook/useAxios';
 
-const SpaceManager = ({ onAddClick }) => {
-    const [spaces, setSpaces] = useState([]);  // 공간 목록 상태
-    const [loading, setLoading] = useState(true);  // 로딩 상태
-    const [error, setError] = useState('');  // 오류 상태
-    const [popupVisible, setPopupVisible] = useState(false);  // 팝업 가시성 상태
-    const [name, setName] = useState('');  // 공간 이름 상태
-    const [publicStatus, setPublicStatus] = useState('Y');  // 공개 여부 상태
+const SpaceManager = ({ onAddClick, onDmClick }) => {
+    const [spaces, setSpaces] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const [popupVisible, setPopupVisible] = useState(false);
+    const [joinspaceVisible, setJoinspaceVisible] = useState(false); // Joinspace 팝업 상태 추가
+    const [name, setName] = useState('');
+    const [publicStatus, setPublicStatus] = useState('Y');
 
     const { authenticationConnect } = useAxios();
 
     const fetchSpaces = async () => {
         try {
-            const response = await authenticationConnect('get', "/spaces/public");
-            setSpaces(response.data);  // 상태 업데이트
+            const response = await authenticationConnect('get', "/spaces/my");
+            setSpaces(response.data);
         } catch (error) {
             console.error('Error fetching spaces:', error);
             setError('Failed to load spaces');
         } finally {
-            setLoading(false);  // 로딩 상태 업데이트
+            setLoading(false);
         }
     };
 
@@ -38,7 +41,7 @@ const SpaceManager = ({ onAddClick }) => {
                 isPublic: publicStatus,
                 thumbnail: null
             });
-            fetchSpaces();  // 공간 목록을 새로 고침
+            fetchSpaces();
             setPopupVisible(false);
             setName('');
             setPublicStatus('Y');
@@ -49,14 +52,24 @@ const SpaceManager = ({ onAddClick }) => {
     };
 
     const handleSpaceClick = (id) => {
-        console.log('Selected Space ID:', id);  // 클릭된 스페이스 ID 콘솔 출력
-        onAddClick(id); // 부모 컴포넌트로 ID 전달
+        console.log('Selected Space ID:', id);
+        onAddClick(id);
+    };
+
+    const handleUrlSubmit = async (uuid) => {
+        try {
+            await authenticationConnect('post', `/spaces/join/${uuid}`);
+            fetchSpaces();
+        } catch (error) {
+            console.error('Error joining space:', error);
+            setError('Failed to join space');
+        }
     };
 
     return (
         <>
             <div className="add-wrap">
-                {/* 공간 목록 */}
+                <div className="DM add" onClick={onDmClick}>DM</div>
                 {!loading && !error && spaces.map((space) => (
                     <div
                         key={space.id}
@@ -69,9 +82,9 @@ const SpaceManager = ({ onAddClick }) => {
                 {loading && <p>Loading...</p>}
                 {error && <p>{error}</p>}
                 <div className="add" onClick={() => setPopupVisible(true)}>Add</div>
+                <div className="add join" onClick={() => setJoinspaceVisible(true)}>Join</div>
             </div>
 
-            {/* 팝업창 */}
             {popupVisible && (
                 <Popup closePopup={() => setPopupVisible(false)}>
                     <h2>Enter Details</h2>
@@ -101,6 +114,13 @@ const SpaceManager = ({ onAddClick }) => {
                         <button type="submit">Submit</button>
                     </form>
                 </Popup>
+            )}
+
+            {joinspaceVisible && (
+                <Joinspace
+                    closePopup={() => setJoinspaceVisible(false)}
+                    onSubmit={handleUrlSubmit}
+                />
             )}
         </>
     );
