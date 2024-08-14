@@ -1,0 +1,16 @@
+.thread-top{
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.thread-top p{
+    font-size: 20px;
+    color: #80848E;
+}
+
+.thread-line{
+    margin: 0;
+}

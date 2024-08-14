@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { WebSocketApi } from '../../api/websocket';
 import { useAxios } from '../../hook/useAxios';
 import './textChat.css';  // CSS 파일 임포트
 
-export const EnterTextChannel = ({ channelId, channelName }) => {
+export const EnterTextChannel = ({ spaceId, channelId, channelName, handleThread }) => {
     const token = sessionStorage.getItem("accessToken");
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
@@ -11,7 +12,7 @@ export const EnterTextChannel = ({ channelId, channelName }) => {
     const [previewImgUrl, setPreviewImgUrl] = useState(null);
     const [error, setError] = useState('');
     const [isChatTextDisabled, setIsChatTextDisabled] = useState(false);
-    const [typingUsers, setTypingUsers] = useState(new Set()); // 여러 사용자의 타이핑 상태를 관리
+    const messagesEndRef = useRef(null);
     const fileRef = useRef(null);
     const ws = useRef(null);
 
@@ -19,9 +20,10 @@ export const EnterTextChannel = ({ channelId, channelName }) => {
 
     useEffect(() => {
         if (channelId) {
-            setMessages([]);
-            setTypingUsers(new Set());
-            setInputValue('');
+            // 메시지 리스트 초기화
+            if (messages) {
+                setMessages([]);
+            }
             connectWebSocket(channelId);
         }
 
@@ -48,25 +50,14 @@ export const EnterTextChannel = ({ channelId, channelName }) => {
             socket.onmessage = (event) => {
 
                 const data = JSON.parse(event.data);
-                if (data.typing) {
-                    setTypingUsers(prev => new Set(prev).add(data.username)); // 타이핑 중인 사용자 추가
-                } else if (data.typing === false) {
-                    setTypingUsers(prev => {
-                        const updated = new Set(prev);
-                        updated.delete(data.username); // 타이핑 중지된 사용자 제거
-                        return updated;
-                    });
-                }
 
-                if (data.contents) {
-                    setMessages(prevMessages => [...prevMessages, {
-                        id: data.id,
-                        username: data.username,
-                        contents: data.contents,
-                        timestamp: formatDate(new Date(data.createdAt)),
-                        type: data.type
-                    }]);
-                }
+                setMessages(prevMessages => [...prevMessages, {
+                    id: data.id,
+                    username: data.username,
+                    contents: data.contents,
+                    timestamp: formatDate(new Date(data.createdAt)),
+                    type: data.type
+                }]);
             };
 
             socket.onclose = () => {
@@ -86,21 +77,6 @@ export const EnterTextChannel = ({ channelId, channelName }) => {
 
     const handleInputChange = (event) => {
         setInputValue(event.target.value);
-
-        if (event.target.value.trim() === '') {
-            sendTypingStatus(false); // 입력이 비어있다면 타이핑 중지 메시지 전송
-        } else if (!typingUsers.has(token)) {
-            sendTypingStatus(true); // 입력이 시작되면 타이핑 중 메시지 전송
-        }
-    };
-
-    const sendTypingStatus = (isTyping) => {
-        if (ws.current) {
-            const data = {
-                typing: isTyping,
-            };
-            ws.current.send(JSON.stringify(data));
-        }
     };
 
     const handleSendMessage = async (event) => {
@@ -110,7 +86,6 @@ export const EnterTextChannel = ({ channelId, channelName }) => {
             }
             ws.current.send(JSON.stringify(data));
             setInputValue('');
-            sendTypingStatus(false);
         } else if (postImg && inputValue === '') {
             event.preventDefault();
 
@@ -124,11 +99,8 @@ export const EnterTextChannel = ({ channelId, channelName }) => {
     };
 
     const handleKeyPress = (event) => {
-        if (event.isComposing || event.keyCode === 229) {
-            return;
-        }
-
         if (event.key === 'Enter') {
+            console.log('엔터 눌림')
             handleSendMessage(event);
         }
     };
@@ -189,20 +161,24 @@ export const EnterTextChannel = ({ channelId, channelName }) => {
             <div id="messages-list">
                 {messages.slice().reverse().map((msg) => (
                     <div key={msg.id} className={`message ${msg.type === 'TEXT' ? 'text-message' : 'file-message'}`}>
+                        <div className='message-info'>
                         <p>
                             {msg.username}&nbsp;&nbsp;<span className="timestamp">({msg.timestamp})</span>
                         </p>
+                        <div className='right' onClick={handleThread(msg.id, msg.contents)}>스레드</div>
+                        </div>
                         {msg.type === 'TEXT' ? (
                             <p>{msg.contents}</p>
                         ) : (
-                            <a href={msg.contents} target="_blank" rel="noopener noreferrer">
+                            <p>
                                 <img src={msg.contents}></img>
-                            </a>
+                            </p>
                         )}
                         <hr className="message-line" />
                     </div>
                 ))}
             </div>
+
             <div className="msg-wrap">
                 {error && (
                     <div className="upload-error">
@@ -222,7 +198,7 @@ export const EnterTextChannel = ({ channelId, channelName }) => {
                     </div>
                     <input type="text"
                         className="chat-text"
-                        placeholder={`${channelName}에 메시지 보내기`}
+                        placeholder={`${channelName} 에 메시지 보내기`}
                         value={inputValue}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyPress}
@@ -230,13 +206,6 @@ export const EnterTextChannel = ({ channelId, channelName }) => {
                     />
                     <button className="send icon cell" onClick={handleSendMessage}></button>
                 </div>
-            </div>
-            <div className="typing-container">
-                {typingUsers.size > 0 && (
-                    <div className="typing-indicator">
-                        <p>{[...typingUsers].join(', ')}님이 입력 중입니다...</p>
-                    </div>
-                )}
             </div>
         </>
     )

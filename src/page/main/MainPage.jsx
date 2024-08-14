@@ -7,6 +7,7 @@ import './mainPage.css';
 import VideoCall from "../../component/videocall/VideoCall";
 import { useAxios } from '../../hook/useAxios';
 import { EventSourceApi } from '../../api/sse';
+import Thread from '../../component/thread/Thread';
 
 function MainPage() {
     const [showAddButton, setShowAddButton] = useState(false); // 버튼의 가시성 상태
@@ -21,6 +22,8 @@ function MainPage() {
     const [textChatVisible, setTextChatVisible] = useState(false); // 텍스트 채팅 가시성 상태
     const [textChatChannelId, setTextChatChannelId] = useState(null); // 텍스트 채팅 채널 ID
     const [textChannelName, setTextChatChannelName] = useState(null); // 텍스트 채팅 채널 이름
+    const [threadVisible, setThreadVisible] = useState(false); // 스레드 가시성 상태
+    const [threadText, setThreadText] = useState(null); // 스레드 이름
 
     const [user, setUser] = useState({});
 
@@ -123,6 +126,19 @@ function MainPage() {
         }
     };
 
+    const handleThread = (textId, text) => e => {
+        console.log(textId);
+        console.log(text);
+        setThreadVisible(true);
+        setThreadText(text);
+
+        // 닫기 이벤트도 만들어줘야함
+    }
+
+    const closeThread = (e) => {
+        setThreadVisible(false);
+    }
+
     return (
         <div className="main__wrap">
             <div className="social cell">
@@ -165,9 +181,26 @@ function MainPage() {
                                 user = {user} />
                             )}
 
-                            {textChatVisible && < TextChat channelId={textChatChannelId} channelName={channelName} />}
+                            {textChatVisible && <TextChat 
+                                channelId={textChatChannelId} 
+                                channelName={channelName} 
+                                spaceId={spaceId} 
+                                handleThread={handleThread}
+                            />}
                         </div>
                     </div>
+
+                    {/* 스레드 시작 */}
+                    {threadVisible && 
+                    <div className='thread'>
+                        <Thread 
+                            spaceId={spaceId}
+                            channelId={textChatChannelId}
+                            closeThread={closeThread}
+                            text={threadText}
+                            channelName={channelName}
+                        ></Thread>
+                    </div>}
                 </div>
             </div>
         </div>
