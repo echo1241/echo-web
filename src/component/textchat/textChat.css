@@ -17,6 +17,11 @@
 .message.file-message img {
   margin-top: 5px;
   max-width: 400px;
+  border-radius: 10px;
+}
+
+.message.file-message img:hover {
+  cursor: pointer;
 }
 
 .message{
@@ -38,6 +43,11 @@
   margin: 10px 0 10px 10px;
   max-height: 200px;
   width: auto;
+  -webkit-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  -moz-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  -ms-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  -o-box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
 }
 
 .upload-error{
@@ -143,7 +153,7 @@
 }
 
 /* 제출 버튼 */
-button {
+button{
   background-color: #007bff;
   color: #fff;
   border: none;
@@ -152,6 +162,16 @@ button {
   cursor: pointer;
 }
 
-button:hover {
+button:hover{
   background-color: #0056b3;
+}
+
+.typing-container{
+  position: fixed;
+  bottom: 0;
+  margin-left: 15px;
+}
+
+.typing-container p{
+  font-size: 0.9em;
 }

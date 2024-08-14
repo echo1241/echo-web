@@ -169,7 +169,7 @@ html{
 
 .chat-box {
     width: 100%;
-    height: calc(100% - 74px);
+    height: calc(100% - 75px);
     display: flex;
     flex-direction: column;
     /* overflow: auto; */
