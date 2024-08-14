@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAxios } from '../../hook/useAxios';
+import { WebSocketApi } from '../../api/websocket';
 import './textChat.css';  // CSS 파일 임포트
 
-export const EnterTextChannel = ({ channelId, channelName, dmId }) => {
+export const TextChat = ({ user, channelId, channelName, dmId }) => {
     const token = sessionStorage.getItem("accessToken");
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
-    const [webSocket, setWebSocket] = useState(null);
+    // const [webSocket, setWebSocket] = useState(null);
     const [postImg, setPostImg] = useState([]);
     const [previewImgUrl, setPreviewImgUrl] = useState(null);
     const [error, setError] = useState('');
@@ -30,13 +31,9 @@ export const EnterTextChannel = ({ channelId, channelName, dmId }) => {
                 ws.current.close();
             }
         };
-    }, [channelId, channelName, dmId]);
+    }, [user, channelId, channelName, dmId]);
 
     const connectWebSocket = (channelId, dmId) => {
-        if (webSocket !== null) {
-            return;
-        }
-
         if (token) {
             const host = process.env.REACT_APP_SERVER;
             let url;
@@ -47,52 +44,63 @@ export const EnterTextChannel = ({ channelId, channelName, dmId }) => {
             } else if (dmId) {
                 // DM용 WebSocket URL
                 url = `ws://${host}/text?dmId=${dmId}&token=${token}`;
+                console.log("connection url : " + url);
             }
 
-            const socket = new WebSocket(url);
-
-            socket.onopen = () => {
-                 console.log('WebSocket is connected');
-            };
-
-            socket.onmessage = (event) => {
-
-                const data = JSON.parse(event.data);
-                if (data.typing) {
-                    setTypingUsers(prev => new Set(prev).add(data.username)); // 타이핑 중인 사용자 추가
-                } else if (data.typing === false) {
-                    setTypingUsers(prev => {
-                        const updated = new Set(prev);
-                        updated.delete(data.username); // 타이핑 중지된 사용자 제거
-                        return updated;
-                    });
-                }
-
-                if (data.contents) {
-                    setMessages(prevMessages => [...prevMessages, {
-                        id: data.id,
-                        username: data.username,
-                        contents: data.contents,
-                        timestamp: formatDate(new Date(data.createdAt)),
-                        type: data.type
-                    }]);
-                }
-            };
-
-            socket.onclose = () => {
-                // console.log('WebSocket is disconnected');
-            };
-
-            socket.onerror = (error) => {
-                // console.log('WebSocket error : ', error);
-            };
-
-            // setWebSocket(socket);
-            ws.current = socket;
+            const socket = new WebSocketApi(url, {
+                handleSocketOpen,
+                handleSocketMessage,
+                handleSocketClose,
+                handleSocketError
+            });
+            console.log("socket : " + socket);
+            ws.current = socket.socket;
         } else {
             // console.error('Token is missing');
         }
     }
+
+    const handleSocketOpen = () => {
+        console.log('WebSocket is connected');
+    };
+
+    const handleSocketMessage = (event) => {
+
+        const data = JSON.parse(event.data);
+
+        if (data.typing && data.username !== user.nickname) {
+            setTypingUsers(prev => {
+                const updated = new Set(prev);
+                updated.add(data.username)  // 타이핑 중인 사용자 추가
+                return updated;
+            });
+        } else if (data.typing === false) {
+            setTypingUsers(prev => {
+                const updated = new Set(prev);
+                updated.delete(data.username); // 타이핑 중지된 사용자 제거
+                return updated;
+            });
+        }
+
+        if (data.contents) {
+            setMessages(prevMessages => [...prevMessages, {
+                id: data.id,
+                username: data.username,
+                contents: data.contents,
+                timestamp: formatDate(new Date(data.createdAt)),
+                type: data.type
+            }]);
+        }
+    };
+
+    const handleSocketClose = () => {
+        // console.log('WebSocket is disconnected');
+    };
+
+    const handleSocketError = (error) => {
+        // console.log('WebSocket error : ', error);
+    };
+
 
     const handleInputChange = (event) => {
         setInputValue(event.target.value);
@@ -206,7 +214,7 @@ export const EnterTextChannel = ({ channelId, channelName, dmId }) => {
                             <p>{msg.contents}</p>
                         ) : (
                             <a href={msg.contents} target="_blank" rel="noopener noreferrer">
-                                <img src={msg.contents}></img>
+                                <img src={msg.contents} alt="chatImage"></img>
                             </a>
                         )}
                         <hr className="message-line" />
@@ -214,43 +222,47 @@ export const EnterTextChannel = ({ channelId, channelName, dmId }) => {
                 ))}
             </div>
             <div className="msg-wrap">
-                {error && (
-                    <div className="upload-error">
-                        <p style={{ color: 'red' }}>{error}</p>
-                    </div>
-                )}
-                {previewImgUrl && (
-                    <div className="preview-img">
-                        <img src={previewImgUrl} alt="Priview" />
-                        <button className="img-delete-button" onClick={handleImgDeleteClick} />
-                        <hr className="msg-wrap-line" />
-                    </div>
-                )}
                 <div className="send-chat">
-                    <div className="plus icon cell" onClick={handleUploadButton}>
-                        <input className='image-upload' type="file" accept="image/*" onChange={handleFileChange} ref={fileRef} />
+                    {error && (
+                        <div className="upload-error">
+                            <p style={{ color: 'red' }}>{error}</p>
+                        </div>
+                    )}
+
+                    {previewImgUrl && (
+                        <div className="preview-img">
+                            <img src={previewImgUrl} alt="Priview" />
+                            <button className="img-delete-button" onClick={handleImgDeleteClick} />
+                            <hr className="msg-wrap-line" />
+                        </div>
+                    )}
+                    <div className="send-chat-bar">
+                        <div className="plus icon cell" onClick={handleUploadButton}>
+                            <input className='image-upload' type="file" accept="image/*" onChange={handleFileChange} ref={fileRef} />
+                        </div>
+                        <input type="text"
+                            className="chat-text"
+                            placeholder={`${channelName}에 메시지 보내기`}
+                            value={inputValue}
+                            onChange={handleInputChange}
+                            onKeyDown={handleKeyPress}
+                            disabled={isChatTextDisabled}
+                        />
+                        <button className="send icon cell" onClick={handleSendMessage}></button>
                     </div>
-                    <input type="text"
-                        className="chat-text"
-                        placeholder={`${channelName}에 메시지 보내기`}
-                        value={inputValue}
-                        onChange={handleInputChange}
-                        onKeyDown={handleKeyPress}
-                        disabled={isChatTextDisabled}
-                    />
-                    <button className="send icon cell" onClick={handleSendMessage}></button>
                 </div>
             </div>
             <div className="typing-container">
                 {typingUsers.size > 0 && (
-                    <div className="typing-indicator">
-                        <p>{[...typingUsers].join(', ')}님이 입력 중입니다...</p>
-                    </div>
+                    <p className="typing-indicator">
+                        {typingUsers.size <= 3
+                            ? `${[...typingUsers].join(', ')}님이 입력 중입니다...`
+                            : "여러 명이 입력 중입니다..."}
+                    </p>
                 )}
             </div>
         </>
     )
 };
 
-export default EnterTextChannel;
-
+export default TextChat;

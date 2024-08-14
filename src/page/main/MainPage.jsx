@@ -20,17 +20,16 @@ function MainPage() {
     const [videoCallChannelId, setVideoCallChannelId] = useState(null); // 화상 통화 채널 ID
     const [textChatVisible, setTextChatVisible] = useState(false); // 텍스트 채팅 가시성 상태
     const [textChatChannelId, setTextChatChannelId] = useState(null); // 텍스트 채팅 채널 ID
-    const [textChannelName, setTextChatChannelName] = useState(null); // 텍스트 채팅 채널 이름
     const [textChatDmId, setTextChatDmId] = useState(null); // DM ID 상태 추가
     const [dmVisible, setDmVisible] = useState(false);
-    const [nicknamePopupVisible, setNicknamePopupVisible] = useState(false);
-    const [nickname, setNickname] = useState('');
+    const [emailPopupVisible, setReceiverEmailPopupVisible] = useState(false);
+    const [email, setReceiverEmail] = useState('');
     const [user, setUser] = useState({});
     const [dmList, setDmList] = useState([]); // DM 목록 상태 추가
     const [userList, setUserList] = useState([]); // 유저 목록 상태 추가
     const [showUserList, setShowUserList] = useState(false); // 유저 리스트 표시 상태 추가
     const { authenticationConnect } = useAxios();
-    
+
     useEffect(() => {
         const getUser = async () => {
             const res = await authenticationConnect('get', '/users/profile');
@@ -86,7 +85,7 @@ function MainPage() {
 
     const fetchDmList = async () => {
         try {
-            const response = await authenticationConnect('get', '/dm/all'); // DM 목록 조회 API 호출
+            const response = await authenticationConnect('get', '/dm'); // DM 목록 조회 API 호출
             setDmList(response.data); // DM 목록 상태 업데이트
         } catch (error) {
             console.error('Error fetching DM list:', error);
@@ -143,31 +142,34 @@ function MainPage() {
             setTextChatChannelId(channel.id);
             setVideoCallVisible(false);
             setTextChatVisible(true);
+            setShowUserList(true);
         }
     };
 
-    const handleDmItemClick = (dmId) => {
+    const handleDmItemClick = (dmId, nickname) => {
         setTextChatDmId(dmId); // DM ID 설정
-        setTextChatChannelId(null); // 채널 ID 초기화
+        setChannelName(nickname);
+        setTextChatChannelId(''); // 채널 ID 초기화
         setVideoCallVisible(false);
+        setShowUserList(false);
         setTextChatVisible(true);
     };
 
-    const handleNicknameSubmit = async (event) => {
+    const handleEmailSubmit = async (event) => {
         event.preventDefault();
 
-        if (!nickname.trim()) {
-            setError('Nickname is required.');
+        if (!email.trim()) {
+            setError('email is required.');
             return;
         }
 
         try {
             // DM 생성 API 호출
             await authenticationConnect('post', '/dm/create', {
-                recipientEmail: nickname,  // DM을 받을 사용자 이메일
+                recipientEmail: email,  // DM을 받을 사용자 이메일
             });
 
-            setNicknamePopupVisible(false);
+            setReceiverEmailPopupVisible(false);
             setDmVisible(true);  // DM 목록을 다시 불러오거나 UI 갱신
         } catch (error) {
             console.error('Error creating DM:', error);
@@ -189,7 +191,7 @@ function MainPage() {
                         {dmVisible && (
                             <div className="dm-text">
                                 DM
-                                <button className="nickname-button" onClick={() => setNicknamePopupVisible(true)}>+</button>
+                                <button className="email-button" onClick={() => setReceiverEmailPopupVisible(true)}>+</button>
                             </div>
                         )}
 
@@ -197,11 +199,14 @@ function MainPage() {
                             <div className="dm-list">
                                 {dmList.length > 0 ? (
                                     <ul>
-                                        {dmList.map(dm => (
-                                            <li key={dm.id} onClick={() => handleDmItemClick(dm.id)}>
-                                                {dm.nickname}
-                                            </li>
-                                        ))}
+                                        {dmList.map(dm => {
+                                            const nickname = user.id === dm.senderId ? dm.receiver : dm.sender;
+                                            return (
+                                                <li key={dm.id} onClick={() => handleDmItemClick(dm.id, nickname)}>
+                                                    {nickname}
+                                                </li>
+                                            )
+                                        })}
                                     </ul>
                                 ) : (
                                     <p>No DMs available</p>
@@ -209,17 +214,17 @@ function MainPage() {
                             </div>
                         )}
 
-                        {nicknamePopupVisible && (
-                            <Popup closePopup={() => setNicknamePopupVisible(false)}>
-                                <h2>Enter Nickname</h2>
-                                <form onSubmit={handleNicknameSubmit}>
+                        {emailPopupVisible && (
+                            <Popup closePopup={() => setReceiverEmailPopupVisible(false)}>
+                                <h2>Enter Receiver Email</h2>
+                                <form onSubmit={handleEmailSubmit}>
                                     <div className="form-group">
-                                        <label htmlFor="nickname">email:</label>
+                                        <label htmlFor="email">email:</label>
                                         <input
                                             type="text"
-                                            id="nickname"
-                                            value={nickname}
-                                            onChange={(e) => setNickname(e.target.value)}
+                                            id="email"
+                                            value={email}
+                                            onChange={(e) => setReceiverEmail(e.target.value)}
                                             required
                                         />
                                     </div>
@@ -238,9 +243,7 @@ function MainPage() {
 
                         <div className="icon-box">
                             <div className="profile cell"></div>
-                            <div className="mic cell"></div>
-                            <div className="sound cell"></div>
-                            <div className="setting cell"></div>
+                            <div className="userNickname">{user.nickname}</div>
                         </div>
                     </div>
 
@@ -257,7 +260,7 @@ function MainPage() {
                                 <VideoCall channelId={videoCallChannelId} user={user} />
                             )}
 
-                            {textChatVisible && < TextChat channelId={textChatChannelId} channelName={channelName} dmId={textChatDmId}/>}
+                            {textChatVisible && < TextChat user={user} channelId={textChatChannelId} channelName={channelName} dmId={textChatDmId} />}
                         </div>
                         {showUserList && (
                             <div className="user-list cell">
