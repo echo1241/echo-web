@@ -289,6 +289,11 @@ button:hover {
     flex-direction: column-reverse;
     overflow: auto;
 }
+.user-list{
+    width: 15%;
+    height: 86%;
+    background-color: #2B2D31;
+}
 
 .timestamp{
     font-size: 0.8em;

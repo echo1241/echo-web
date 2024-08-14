@@ -16,7 +16,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
 
     const fetchSpaces = async () => {
         try {
-            const response = await authenticationConnect('get', "/spaces/public");
+            const response = await authenticationConnect('get', "/spaces/my");
             setSpaces(response.data);
         } catch (error) {
             console.error('Error fetching spaces:', error);

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import SpaceManager from '../../component/space/SpaceManager';
 import ChannelManager from '../../component/channel/ChannalManager';
 import TextChat from '../../component/TextChat';
@@ -27,6 +26,8 @@ function MainPage() {
     const [nickname, setNickname] = useState('');
     const [user, setUser] = useState({});
     const [dmList, setDmList] = useState([]); // DM 목록 상태 추가
+    const [userList, setUserList] = useState([]); // 유저 목록 상태 추가
+    const [showUserList, setShowUserList] = useState(false); // 유저 리스트 표시 상태 추가
     const { authenticationConnect } = useAxios();
 
     useEffect(() => {
@@ -37,7 +38,7 @@ function MainPage() {
         }
         getUser();
 
-        // sse 연결
+        // SSE 연결
         const host = process.env.REACT_APP_SERVER;
         const url = `http://${host}/notice/sse/connect`;
 
@@ -50,15 +51,31 @@ function MainPage() {
         new EventSourceApi(url, options, handleOnMessage);
     }, [])
 
+    useEffect(() => {
+        if (spaceId) {
+            fetchUserList();
+        }
+    }, [spaceId]);
+
     const handleOnMessage = data => {
         const message = data;
         console.log(message);
     }
 
+    const fetchUserList = async () => {
+        try {
+            const response = await authenticationConnect('get', `/spaces/${spaceId}/members`); // 유저 목록 조회 API 호출
+            setUserList(response.data); // 유저 목록 상태 업데이트
+        } catch (error) {
+            console.error('Error fetching user list:', error);
+        }
+    };
+
     const handleAddClick = (id) => {
         setSpaceId(id); // 스페이스 ID 설정
         setShowAddButton(true); // 버튼을 보이게 설정
         setShowChannelManager(true); // 채널 매니저 보이기 설정
+        setShowUserList(true); // 유저 리스트 보이기 설정
     };
 
     const handleDmClick = async () => {
@@ -108,6 +125,8 @@ function MainPage() {
     const handleCloseChannelManager = () => {
         setShowChannelManager(false);
         setSpaceId(null);
+        setUserList([]); // 유저 목록 초기화
+        setShowUserList(false); // 유저 리스트 숨기기
     };
 
     const handleChannelClick = (channel) => {
@@ -237,10 +256,25 @@ function MainPage() {
                                 <VideoCall channelId={videoCallChannelId} user={user} />
                             )}
 
-                            {textChatVisible && (<TextChat channelId={textChatChannelId} dmId={textChatDmId} // DM ID 전달
+                            {textChatVisible && (
+                                <TextChat channelId={textChatChannelId} dmId={textChatDmId} // DM ID 전달
                                 />
                             )}
                         </div>
+                        {showUserList && (
+                            <div className="user-list cell">
+                                <h3>스페이스 내 유저 목록</h3>
+                                {userList.length > 0 ? (
+                                    <ul>
+                                        {userList.map(user => (
+                                            <li key={user.id}>{user.nickname}</li>
+                                        ))}
+                                    </ul>
+                                ) : (
+                                    <p>사용자가 없습니다</p>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
