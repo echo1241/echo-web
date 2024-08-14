@@ -59,6 +59,10 @@ html{
 }
 .add-wrap{
     margin-top:50px;
+    overflow: auto;
+}
+.add-wrap::-webkit-scrollbar{
+    display: none;
 }
 .add{
     width:60px;
@@ -115,6 +119,8 @@ html{
     height:6%;
     background-color:#232428;
     position:absolute;
+    display: flex;
+    align-items: center;
     bottom:0px;
 }
 
@@ -126,44 +132,16 @@ html{
 
 }
 .profile{
-    width:35px;
-    height:35px;
+    width:40px;
+    height:40px;
     background-color:red;
-    margin-left:10px;
-    margin-top:8px;
+    margin-left:20px;
+    /* margin-top:8px; */
 }
-.mic{
-    width:35px;
-    height:35px;
-    float:right;
-    margin-right:10px;
-    margin-top:8px;
-    background-image: url('../../../public/images/media/mic-on.svg');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-.sound{
-    width:35px;
-    height:35px;
-    background-image: url('../../../public/images/media/headphone-on.svg');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-    margin-right:10px;
-    float:right;
-    margin-top:8px;
-}
-.setting{
-    width:35px;
-    height:35px;
-    margin-right:10px;
-    float:right;
-    margin-top:8px;
-    background-image: url('../../../public/images/media/mic-on.svg');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+.userNickname{
+    margin-left: 15px;
+    /* margin-bottom: 10px; */
+    font-size: 1.5em;
 }
 .chat-channal{
     width:30px;
@@ -188,7 +166,7 @@ html{
 
 .chat-box {
     width: 87%;
-    height: calc(100% - 75px);
+    height: calc(100% - 60px);
     display: flex;
     flex-direction: column;
     /* overflow: auto; */

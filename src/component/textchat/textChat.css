@@ -90,15 +90,12 @@
 
 .msg-wrap-line{
   margin: 0 auto 0 auto;
-  width: 100%;
   border: 1px solid rgba(128, 128, 128, 0.2);
 }
 
 .msg-wrap{
-  /* width:99%; */
-  /* margin-left: 10px; */
   padding: 0 10px;
-  /* background-color: #383A40; */
+  /* padding: 10px; */
   z-index: 5;       /* 다른 요소들 위에 위치하도록 설정 */
   display: flex;
   flex-direction: column;  /* 세로 방향으로 배치 */
@@ -107,18 +104,21 @@
 }
 
 .send-chat{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
     background-color:#383A40;
     border-radius:8px;
+}
+
+.send-chat-bar{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .chat-text{
   /* width: 90%; */
   flex: 1 1 auto;
-  height: 50px;
+  height: 45px;
   margin-left: 15px;
   /* margin-top: 5px; */
   background-color: transparent;
@@ -142,13 +142,13 @@
   margin-left:5px;
 }
 
-.image-upload{
-  display: none;
-}
-
 .plus:hover{
   cursor: pointer;
-  background-color: white;
+  background-color: rgb(112, 112, 112);
+}
+
+.image-upload{
+  display: none;
 }
 
 .send{
@@ -178,9 +178,10 @@ button:hover{
 }
 
 .typing-container{
-  position: fixed;
+  /* position: fixed; */
   bottom: 0;
-  margin-left: 15px;
+  margin: 5px 0 0 15px;
+  
 }
 
 .typing-container p{

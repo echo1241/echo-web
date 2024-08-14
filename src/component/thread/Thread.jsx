@@ -13,6 +13,8 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
     const textInputRef = useRef(null);
     const { authenticationConnect } = useAxios();
 
+    const firstTextRef = useRef(null);
+
     const basicThreadUrl = `/spaces/${spaceId}/channels/${channelId}/texts/${threadTextInfo.textId}/threads`;
 
     useEffect(() => {
@@ -21,6 +23,8 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
             websocketRef.current.close();
         }
         websocketRef.current = null;
+        threadIdRef.current = null;
+        firstTextRef.current = null;
         const getThreads = async () => {
             const response = await authenticationConnect('get', basicThreadUrl);
             if (response.data === "") {
@@ -48,9 +52,20 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
     const startThread = async () =>  {
         // 스레드 시작을 위해서 스레드를 생성한다.
         console.log("스레드 시작");
+        const content = textInputRef.current.value;
         try {
             const response = await authenticationConnect('post', basicThreadUrl);
             threadIdRef.current = response.data.id;
+            
+            console.log(threadIdRef.current);
+            startThreadSession();
+
+            // 스레드 메시지 전송
+            const message = {
+                content: content
+            }
+
+            firstTextRef.current = message;
         } catch (e) {
             console.error(e);
         }
@@ -77,6 +92,10 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
 
     const threadSocketOpen = event => {
         console.log("스레드 소켓 연결완료");
+        if (firstTextRef.current){
+            websocketRef.current.send(JSON.stringify(firstTextRef.current));
+            firstTextRef.current = null;
+        }
     }
 
     const threadSocketOnMessage = event => {
@@ -99,13 +118,13 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
         if (event.key === 'Enter') {
             // 스레드 생성
             const content = textInputRef.current.value;
-            textInputRef.current.value = '';
-            if (websocketRef.current == null) {
+            if (threadIdRef.current == null) {
                 console.log('스레드 세션을 시작합니다.');
                 startThread();
-                startThreadSession();
+                textInputRef.current.value = '';
                 return;
             }
+            textInputRef.current.value = '';
 
             // 스레드 메시지 전송
             const message = {
@@ -118,42 +137,43 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
 
     return (
         <>
+        {/* top */}
         <div className="thread-top">
-        {/* 상단에 X 버튼이 있어야 함 */}
-        <p># {channelName} > {threadTextInfo.text}</p>
-        <div>
-            <p className="thread-top-close" onClick={closeThread}>X</p>
-        </div>
+            {/* 상단에 X 버튼이 있어야 함 */}
+            <p># {channelName} > {threadTextInfo.text}</p>
+            <div>
+                <p className="thread-top-close" onClick={closeThread}>X</p>
+            </div>
         </div>
         <hr className="thread-line"></hr>
+        {/* 채팅 내용 */}
         <div className="chat-box cell thread-cell">
-        <div id="messages-list">
-                {messages.slice().reverse().map((msg) => (
-                    <div key={msg.id} className='message text-message'>
-                        <div className='message-info'>
-                        <p>
-                            {msg.nickname}&nbsp;&nbsp;<span className="timestamp">({msg.createdAt})</span>
-                        </p>
+            <div id="messages-list">
+                    {messages.slice().reverse().map((msg) => (
+                        <div key={msg.id} className='message text-message'>
+                            <div className='message-info'>
+                            <p>
+                                {msg.nickname}&nbsp;&nbsp;<span className="timestamp">({msg.createdAt})</span>
+                            </p>
+                            </div>
+                            <p>{msg.content}</p>
+                            <hr className="message-line" />
                         </div>
-                        <p>{msg.content}</p>
-                        <hr className="message-line" />
-                    </div>
-                ))}
+                    ))}
             </div>
             
-        <div className="msg-wrap">
-            <div className="send-chat">
-                <input type="text"
-                    ref={textInputRef}
-                    className="chat-text"
-                    placeholder={textInputMessage}
-                    // value={inputValue}
-                    // onChange={handleInputChange}
-                    onKeyDown={handleKeyPress}
-                    // disabled={isChatTextDisabled}
-                />
-                <button className="send icon cell"></button>
-            </div>
+            <div className="msg-wrap">
+                <div className="send-chat">
+                    <div className="send-chat-bar">
+                        <input type="text"
+                            ref={textInputRef}
+                            className="chat-text"
+                            placeholder={textInputMessage}
+                            onKeyDown={handleKeyPress}
+                        />
+                        <button className="send icon cell"></button>
+                    </div>
+                </div>
             </div>
         </div>
         </>
