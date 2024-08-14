@@ -40,9 +40,14 @@ export function useAxios() {
     const authenticationConnect = async (method, uri, data) => {
         const token = sessionStorage.getItem('accessToken');
         const headers = {
-            'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         };
+
+         if (data instanceof FormData) {
+            delete headers['Content-Type'];
+         } else {
+            headers['Content-Type'] = 'application/json';
+         }
 
         const response = await sendAxiosRequest(method, uri, data, headers, navigate);
         return response;

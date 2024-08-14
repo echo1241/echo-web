@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import SpaceManager from '../../component/space/SpaceManager';
 import ChannelManager from '../../component/channel/ChannalManager';
-import TextChat from '../../component/TextChat';
+import TextChat from '../../component/textchat/TextChat';
 import './mainPage.css';
 import VideoCall from "../../component/videocall/VideoCall";
 import { useAxios } from '../../hook/useAxios';
@@ -9,17 +9,18 @@ import { EventSourceApi } from '../../api/sse';
 import Popup from "../../component/modal/Popup";
 
 function MainPage() {
-    const [showAddButton, setShowAddButton] = useState(false);
-    const [popupVisible, setPopupVisible] = useState(false);
-    const [channelName, setChannelName] = useState('');
-    const [channelType, setChannelType] = useState('text');
-    const [spaceId, setSpaceId] = useState(null);
-    const [error, setError] = useState('');
-    const [showChannelManager, setShowChannelManager] = useState(false);
-    const [videoCallVisible, setVideoCallVisible] = useState(false);
-    const [videoCallChannelId, setVideoCallChannelId] = useState(null);
-    const [textChatVisible, setTextChatVisible] = useState(false);
-    const [textChatChannelId, setTextChatChannelId] = useState(null);
+    const [showAddButton, setShowAddButton] = useState(false); // 버튼의 가시성 상태
+    const [popupVisible, setPopupVisible] = useState(false);  // 팝업의 가시성 상태
+    const [channelName, setChannelName] = useState(''); // 채널 이름 상태
+    const [channelType, setChannelType] = useState('text'); // 채널 타입 상태
+    const [spaceId, setSpaceId] = useState(null); // 선택된 스페이스 ID 상태
+    const [error, setError] = useState(''); // 오류 상태
+    const [showChannelManager, setShowChannelManager] = useState(false); // 채널 매니저 가시성 상태
+    const [videoCallVisible, setVideoCallVisible] = useState(false); // 화상 통화 가시성 상태
+    const [videoCallChannelId, setVideoCallChannelId] = useState(null); // 화상 통화 채널 ID
+    const [textChatVisible, setTextChatVisible] = useState(false); // 텍스트 채팅 가시성 상태
+    const [textChatChannelId, setTextChatChannelId] = useState(null); // 텍스트 채팅 채널 ID
+    const [textChannelName, setTextChatChannelName] = useState(null); // 텍스트 채팅 채널 이름
     const [textChatDmId, setTextChatDmId] = useState(null); // DM ID 상태 추가
     const [dmVisible, setDmVisible] = useState(false);
     const [nicknamePopupVisible, setNicknamePopupVisible] = useState(false);
@@ -29,7 +30,7 @@ function MainPage() {
     const [userList, setUserList] = useState([]); // 유저 목록 상태 추가
     const [showUserList, setShowUserList] = useState(false); // 유저 리스트 표시 상태 추가
     const { authenticationConnect } = useAxios();
-
+    
     useEffect(() => {
         const getUser = async () => {
             const res = await authenticationConnect('get', '/users/profile');
@@ -38,7 +39,7 @@ function MainPage() {
         }
         getUser();
 
-        // SSE 연결
+        // sse 연결
         const host = process.env.REACT_APP_SERVER;
         const url = `http://${host}/notice/sse/connect`;
 
@@ -131,7 +132,7 @@ function MainPage() {
 
     const handleChannelClick = (channel) => {
         setChannelName(channel.channelName);
-        console.log(channel.channelType);
+        console.log(channel.channelType)
 
         if (channel.channelType === 'V') {
             setVideoCallChannelId(channel.id);
@@ -256,10 +257,7 @@ function MainPage() {
                                 <VideoCall channelId={videoCallChannelId} user={user} />
                             )}
 
-                            {textChatVisible && (
-                                <TextChat channelId={textChatChannelId} dmId={textChatDmId} // DM ID 전달
-                                />
-                            )}
+                            {textChatVisible && < TextChat channelId={textChatChannelId} channelName={channelName} dmId={textChatDmId}/>}
                         </div>
                         {showUserList && (
                             <div className="user-list cell">
