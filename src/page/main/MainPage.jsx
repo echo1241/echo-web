@@ -213,7 +213,7 @@ function MainPage() {
                                 <h2>Enter Nickname</h2>
                                 <form onSubmit={handleNicknameSubmit}>
                                     <div className="form-group">
-                                        <label htmlFor="nickname">Nickname:</label>
+                                        <label htmlFor="nickname">email:</label>
                                         <input
                                             type="text"
                                             id="nickname"

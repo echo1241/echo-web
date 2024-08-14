@@ -1,6 +1,7 @@
-// SpaceManager.jsx
+// src/component/space/SpaceManager.jsx
 import React, { useState, useEffect } from 'react';
 import Popup from '../modal/Popup';
+import Joinspace from '../../page/joinspace/Joinspace'; // 올바른 경로로 수정
 import './SpaceManager.css';
 import { useAxios } from '../../hook/useAxios';
 
@@ -9,6 +10,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [popupVisible, setPopupVisible] = useState(false);
+    const [joinspaceVisible, setJoinspaceVisible] = useState(false); // Joinspace 팝업 상태 추가
     const [name, setName] = useState('');
     const [publicStatus, setPublicStatus] = useState('Y');
 
@@ -54,6 +56,16 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
         onAddClick(id);
     };
 
+    const handleUrlSubmit = async (uuid) => {
+        try {
+            await authenticationConnect('post', `/spaces/join/${uuid}`);
+            fetchSpaces();
+        } catch (error) {
+            console.error('Error joining space:', error);
+            setError('Failed to join space');
+        }
+    };
+
     return (
         <>
             <div className="add-wrap">
@@ -70,6 +82,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
                 {loading && <p>Loading...</p>}
                 {error && <p>{error}</p>}
                 <div className="add" onClick={() => setPopupVisible(true)}>Add</div>
+                <div className="add join" onClick={() => setJoinspaceVisible(true)}>Join</div>
             </div>
 
             {popupVisible && (
@@ -101,6 +114,13 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
                         <button type="submit">Submit</button>
                     </form>
                 </Popup>
+            )}
+
+            {joinspaceVisible && (
+                <Joinspace
+                    closePopup={() => setJoinspaceVisible(false)}
+                    onSubmit={handleUrlSubmit}
+                />
             )}
         </>
     );
