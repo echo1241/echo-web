@@ -32,7 +32,7 @@ html{
 }
 
 ::-webkit-scrollbar-track {
-    background: rgba(33, 122, 244, 0.1);
+    background: transparent;
 }
 
 /* 라이브러리 */

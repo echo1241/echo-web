@@ -23,7 +23,7 @@ function MainPage() {
     const [textChatChannelId, setTextChatChannelId] = useState(null); // 텍스트 채팅 채널 ID
     const [textChannelName, setTextChatChannelName] = useState(null); // 텍스트 채팅 채널 이름
     const [threadVisible, setThreadVisible] = useState(false); // 스레드 가시성 상태
-    const [threadText, setThreadText] = useState(null); // 스레드 이름
+    const [threadTextInfo, setThreadTextInfo] = useState(null); // 스레드에 보낼 텍스트 정보
     const [textChatDmId, setTextChatDmId] = useState(null); // DM ID 상태 추가
     const [dmVisible, setDmVisible] = useState(false);
     const [nicknamePopupVisible, setNicknamePopupVisible] = useState(false);
@@ -53,6 +53,8 @@ function MainPage() {
         }
 
         new EventSourceApi(url, options, handleOnMessage);
+
+        console.log("mainPage 랜더링 완료");
     }, [])
 
     useEffect(() => {
@@ -152,10 +154,12 @@ function MainPage() {
     const handleThread = (textId, text) => e => {
         console.log(textId);
         console.log(text);
+        setThreadVisible(false);
         setThreadVisible(true);
-        setThreadText(text);
-
-        // 닫기 이벤트도 만들어줘야함
+        setThreadTextInfo({
+            text,
+            textId
+        });
     }
 
     const closeThread = (e) => {
@@ -303,8 +307,8 @@ function MainPage() {
                             spaceId={spaceId}
                             channelId={textChatChannelId}
                             closeThread={closeThread}
-                            text={threadText}
                             channelName={channelName}
+                            threadTextInfo = {threadTextInfo}
                         ></Thread>
                     </div>}
                 </div>

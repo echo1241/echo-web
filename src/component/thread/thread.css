@@ -3,7 +3,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 10px;
+    padding: 0 0 0 10px;
 }
 
 .thread-top p{
@@ -13,4 +13,17 @@
 
 .thread-line{
     margin: 0;
+}
+
+.thread-top-close{
+    padding: 10px;
+}
+
+.thread-top-close:hover{
+    background-color: #797e8b50;
+    color: white;
+}
+
+.thread-cell{
+    width: 100%;
 }
