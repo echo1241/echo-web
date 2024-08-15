@@ -1,0 +1,29 @@
+.thread-top{
+    height: 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0 0 10px;
+}
+
+.thread-top p{
+    font-size: 20px;
+    color: #80848E;
+}
+
+.thread-line{
+    margin: 0;
+}
+
+.thread-top-close{
+    padding: 10px;
+}
+
+.thread-top-close:hover{
+    background-color: #797e8b50;
+    color: white;
+}
+
+.thread-cell{
+    width: 100%;
+}
