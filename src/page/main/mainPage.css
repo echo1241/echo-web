@@ -91,6 +91,10 @@ html{
 .add:hover {
     border-radius:20px;
 }
+.view{
+    width: 40px;
+    height: 40px;
+}
 
 .main{
     width:95%;
@@ -134,8 +138,9 @@ html{
 .profile{
     width:40px;
     height:40px;
-    background-color:red;
+    background-color:#313338;
     margin-left:20px;
+    border-radius: 20px;
     /* margin-top:8px; */
 }
 .userNickname{

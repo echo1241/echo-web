@@ -54,3 +54,11 @@ video {
   justify-content: center;
   width: 100%;
 }
+
+#muteBtn{
+  background-color: rebeccapurple;
+  background-image: url('../../../public/images/media/headphone-on.svg');
+  background-size: 70px 45px;
+  width:70px;
+  height:45px;
+}

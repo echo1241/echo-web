@@ -263,7 +263,7 @@ function MainPage() {
                         )}
 
                         <div className="icon-box">
-                            <div className="profile cell"></div>
+                            <div className="profile cell"><img src="images/echo.png" alt="" className="view"/></div>
                             <div className="userNickname">{user.nickname}</div>
                         </div>
                     </div>

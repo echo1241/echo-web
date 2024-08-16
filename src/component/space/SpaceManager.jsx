@@ -73,7 +73,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
                 {!loading && !error && spaces.map((space) => (
                     <div
                         key={space.id}
-                        className="cir-btn"
+                        className="cir-btn add"
                         onClick={() => handleSpaceClick(space.id)}
                     >
                         <p>{space.spaceName}</p>
