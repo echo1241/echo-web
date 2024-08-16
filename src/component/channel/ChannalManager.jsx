@@ -4,13 +4,15 @@ import { useAxios } from '../../hook/useAxios';
 import Popup from '../modal/Popup';
 import './channelManager.css'; // CSS 파일 임포트
 
-const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
+const ChannelManager = ({ spaceId, onClose, onClickChannel, setMainPageLastReadMessage }) => {
     const [channels, setChannels] = useState([]);  // 채널 목록 상태
     const [loading, setLoading] = useState(true);  // 로딩 상태
     const [error, setError] = useState('');  // 오류 상태
     const [popupVisible, setPopupVisible] = useState(false);  // 팝업 가시성 상태
     const [channelName, setChannelName] = useState('');  // 채널 이름 상태
     const [channelType, setChannelType] = useState('text');  // 채널 타입 상태
+
+    const selectedChannelRef = useRef(null);
 
     const eventSourceRef = useRef();
     const { authenticationConnect } = useAxios();
@@ -20,6 +22,7 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
         // eventSoure 초기화
         eventSourceRef.current = EventSourceApi.getInstance();
         eventSourceRef.current.setOnMessage(handleOnMesaage);
+        selectedChannelRef.current = null;
     }, []);
 
     const handleOnMesaage = (event) => {
@@ -31,6 +34,22 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
                 setChannels(prevChannels => prevChannels.map(channel => channel.id === event.data.id? event.data : channel));
             } else if (event.eventType === "DELETED") {
                 setChannels(prevChannels => prevChannels.filter(channel => channel.id !== event.data.id));
+            }
+        } else if (event.notificationType === "TEXT") {
+            if (event.eventType === "CREATED") {
+                // 메시지 전송이 일어남
+                console.log(selectedChannelRef.current);
+                if (selectedChannelRef.current !== event.data.channelId) {
+                    setChannels(prevChannels => prevChannels.map(channel => {
+                        if (channel.id === event.data.channelId) {
+                            return {
+                                ...channel,
+                                push: true,
+                            }
+                        }
+                        return channel;
+                    }))
+                }
             }
         }
     }
@@ -89,9 +108,42 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
         console.log('Channel ID:', channel.id); // 채널 ID를 콘솔에 출력
         console.log('Channel Name:', channel.channelName); // 채널 ID를 콘솔에 출력
 
+        selectedChannelRef.current = channel.id;
+        // 채널 클릭 시, push 삭제
+        setChannels(prevChannels => prevChannels.map(prevChannel => {
+            if (prevChannel.id === channel.id) {
+                return {
+                    ...prevChannel,
+                    push: false
+                }
+            }
+            return prevChannel;
+        }));
+
+        // 해당 채널에서 마지막으로 읽은 메시지 아이디를 세팅해준다.
+        // const lastReadMessageId = channels.filter(curChannel => channel.id === curChannel.id)[0].lastReadMessageId;
+        // console.log(lastReadMessageId)
+        // setMainPageLastReadMessage(lastReadMessageId);
+
         // 해당 채널 정보를 전달.
         onClickChannel(channel);
+
+        // 채널 클릭했을 때 해당 채널에서 마지막으로 읽은 정보를 가져와야 한다.
+        getChannelLastMessageInfo(channel.id);
     };
+
+    const getChannelLastMessageInfo = async(channelId) => {
+        // 채널 아이디 및 space 정보
+        // /api/spaces/1/channels/1
+        const response = await authenticationConnect('get', `/spaces/${spaceId}/channels/${channelId}`);
+        if (response?.data?.push) {
+            // 여기에서 
+            console.log(response?.data?.lastReadMessageId)
+            // 근데 이거 늦게 set되는데..... 나중에 null나올거 같은데?;;
+            // ㅎㅎ;;;;  ;;;;;;
+            setMainPageLastReadMessage(response?.data?.lastReadMessageId);
+        }
+    }
 
     const handleChannelText = (e) => {
         e.preventDefault();
@@ -119,7 +171,7 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
                 {channels.map(channel => (
                     <div key={channel.id} className="channel-item">
                         <button
-                            className="channel-button"
+                            className={channel?.push ? "channel-button push": "channel-button"}
                             onClick={() => handleChannelClick(channel)}
                         >
                             {channel.channelName} ({channel.channelType === 'T' ? 'Text' : 'Video'})

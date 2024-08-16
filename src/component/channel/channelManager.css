@@ -37,7 +37,7 @@
 
 .channel-button {
     background-color: transparent;
-    color: white;
+    color: #919191;
     border: none;
     border-radius: 3px;
     cursor: pointer;
@@ -45,6 +45,7 @@
     padding-right: 35px;
     width: 220px;
     word-break: break-all;
+    font-weight: 500;
 }
 
 .channel-delete-button {
@@ -62,4 +63,9 @@
     height: 40px;
     border-radius: 50%;
     background-color: transparent;
+}
+
+.channel-button.push {
+    font-weight: 700;
+    color: #fff;
 }
