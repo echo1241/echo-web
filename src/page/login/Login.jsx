@@ -10,6 +10,8 @@ function Login() {
     const [error, setError] = useState('');
     const [isChecked, setIsChecked] = useState(false);
     const navigate = useNavigate(); // useNavigate 훅 사용
+    const redirect_url = process.env.REACT_APP_REDIRECT
+    const client_id = process.env.REACT_APP_CLIENTID
 
     const { connect } = useAxios();
 
@@ -53,7 +55,7 @@ function Login() {
 
     const handleKakaoLogin = () => {
         // 카카오 로그인 URL로 리다이렉트
-        window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=253310ea8bc3317d5e031006ac418c17&redirect_uri=http://localhost:3000/oauth/kakao/callback&response_type=code';
+        window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id='+client_id+'&redirect_uri='+redirect_url+'&response_type=code';
     };
 
     const emailLocalStorageSave = (email) => {

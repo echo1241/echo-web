@@ -6,6 +6,7 @@ import './mainPage.css';
 import VideoCall from "../../component/videocall/VideoCall";
 import { useAxios } from '../../hook/useAxios';
 import { EventSourceApi } from '../../api/sse';
+import Thread from '../../component/thread/Thread';
 import Popup from "../../component/modal/Popup";
 
 function MainPage() {
@@ -20,6 +21,9 @@ function MainPage() {
     const [videoCallChannelId, setVideoCallChannelId] = useState(null); // 화상 통화 채널 ID
     const [textChatVisible, setTextChatVisible] = useState(false); // 텍스트 채팅 가시성 상태
     const [textChatChannelId, setTextChatChannelId] = useState(null); // 텍스트 채팅 채널 ID
+    const [textChannelName, setTextChatChannelName] = useState(null); // 텍스트 채팅 채널 이름
+    const [threadVisible, setThreadVisible] = useState(false); // 스레드 가시성 상태
+    const [threadTextInfo, setThreadTextInfo] = useState(null); // 스레드에 보낼 텍스트 정보
     const [textChatDmId, setTextChatDmId] = useState(null); // DM ID 상태 추가
     const [dmVisible, setDmVisible] = useState(false);
     const [emailPopupVisible, setReceiverEmailPopupVisible] = useState(false);
@@ -28,6 +32,7 @@ function MainPage() {
     const [dmList, setDmList] = useState([]); // DM 목록 상태 추가
     const [userList, setUserList] = useState([]); // 유저 목록 상태 추가
     const [showUserList, setShowUserList] = useState(false); // 유저 리스트 표시 상태 추가
+    const [lastReadMessageId, setLastReadMessageId] = useState(null);
     const { authenticationConnect } = useAxios();
 
     useEffect(() => {
@@ -49,6 +54,8 @@ function MainPage() {
         }
 
         new EventSourceApi(url, options, handleOnMessage);
+
+        console.log("mainPage 랜더링 완료");
     }, [])
 
     useEffect(() => {
@@ -146,6 +153,21 @@ function MainPage() {
         }
     };
 
+    const handleThread = (textId, text) => e => {
+        console.log(textId);
+        console.log(text);
+        setThreadVisible(false);
+        setThreadVisible(true);
+        setThreadTextInfo({
+            text,
+            textId
+        });
+    }
+
+    const closeThread = (e) => {
+        setThreadVisible(false);
+    }
+
     const handleDmItemClick = (dmId, nickname) => {
         setTextChatDmId(dmId); // DM ID 설정
         setChannelName(nickname);
@@ -182,6 +204,11 @@ function MainPage() {
         setTextChatVisible(false);
         setVideoCallVisible(false);
     };
+    
+    const setMainPageLastReadMessage = (lastReadMessageId) => {
+        console.log("마지막에 읽은 messsageId: ", lastReadMessageId);
+        setLastReadMessageId(lastReadMessageId);
+    }
 
     return (
         <div className="main__wrap">
@@ -215,7 +242,7 @@ function MainPage() {
                                         })}
                                     </ul>
                                 ) : (
-                                    <p>No DMs available</p>
+                                    <p></p>
                                 )}
                             </div>
                         )}
@@ -244,11 +271,12 @@ function MainPage() {
                                 spaceId={spaceId}
                                 onClose={handleCloseChannelManager}
                                 onClickChannel={handleChannelClick}
+                                setMainPageLastReadMessage={setMainPageLastReadMessage}
                             />
                         )}
 
                         <div className="icon-box">
-                            <div className="profile cell"></div>
+                            <div className="profile cell"><img src="images/echo.png" alt="" className="view"/></div>
                             <div className="userNickname">{user.nickname}</div>
                         </div>
                     </div>
@@ -265,8 +293,17 @@ function MainPage() {
                             {videoCallVisible && videoCallChannelId && (
                                 <VideoCall channelId={videoCallChannelId} user={user} onError={handleError} />
                             )}
-
-                            {textChatVisible && < TextChat user={user} channelId={textChatChannelId} channelName={channelName} dmId={textChatDmId} onError={handleError} />}
+                            {textChatVisible && <TextChat 
+                                user={user}
+                                channelId={textChatChannelId} 
+                                channelName={channelName} 
+                                spaceId={spaceId} 
+                                handleThread={handleThread}
+                                dmId={textChatDmId}
+                                lastReadMessageId={lastReadMessageId}
+                                setLastReadMessageId={setLastReadMessageId}
+                                onError={handleError}
+                            />}
                         </div>
                         {showUserList && (
                             <div className="user-list cell">
@@ -283,6 +320,18 @@ function MainPage() {
                             </div>
                         )}
                     </div>
+
+                    {/* 스레드 시작 */}
+                    {threadVisible && 
+                    <div className='thread'>
+                        <Thread 
+                            spaceId={spaceId}
+                            channelId={textChatChannelId}
+                            closeThread={closeThread}
+                            channelName={channelName}
+                            threadTextInfo = {threadTextInfo}
+                        ></Thread>
+                    </div>}
                 </div>
             </div>
         </div>

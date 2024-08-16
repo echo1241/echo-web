@@ -268,7 +268,7 @@ export const VideoCall = ({ channelId, user, onError }) => {
         <video ref={localVideoRef} id="localVideo" autoPlay muted></video>
         <label id="localLabel">Local</label>
         <div className="control-buttons">
-          <button id="muteBtn" className="btn btn-secondary" onClick={handleMuteClick}>Mute</button>
+          <button id="muteBtn" className="btn btn-secondary" onClick={handleMuteClick}></button>
           <button id="cameraBtn" className="btn btn-secondary" onClick={handleCameraClick}>Turn Camera Off</button>
         </div>
       </div>

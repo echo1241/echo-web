@@ -1,14 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useAxios } from '../../hook/useAxios';
 import { WebSocketApi } from '../../api/websocket';
-import { useNavigate } from 'react-router-dom';
+import { useAxios } from '../../hook/useAxios';
 import './textChat.css';  // CSS 파일 임포트
 
-export const TextChat = ({ user, channelId, channelName, dmId, onError }) => {
+export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleThread, lastReadMessageId, setLastReadMessageId, onError }) => {
     const token = sessionStorage.getItem("accessToken");
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
-    // const [webSocket, setWebSocket] = useState(null);
     const [postImg, setPostImg] = useState([]);
     const [previewImgUrl, setPreviewImgUrl] = useState(null);
     const [error, setError] = useState('');
@@ -20,6 +18,21 @@ export const TextChat = ({ user, channelId, channelName, dmId, onError }) => {
     const { authenticationConnect } = useAxios();
 
     useEffect(() => {
+        if (lastReadMessageId){
+            console.log(lastReadMessageId);
+                const element = document.getElementById(lastReadMessageId);
+                if (element) {
+                    console.log("스크롤 이동?");
+                  element.scrollIntoView({ behavior: 'smooth' });
+                }
+        }
+        // 새로운 메시지 정보는 2초 후에 삭제하도록 함
+        setTimeout(() => {
+            setLastReadMessageId(null);
+        }, 3000);
+    }, [lastReadMessageId]);
+
+    useEffect(() => {
         if (channelId || dmId) {
             setMessages([]);
             setTypingUsers(new Set());
@@ -28,6 +41,8 @@ export const TextChat = ({ user, channelId, channelName, dmId, onError }) => {
         }
 
         return () => {
+            authenticationConnect('delete', `/notice/${channelId}`);
+
             if (ws) {
                 ws.current.close();
             }
@@ -134,7 +149,6 @@ export const TextChat = ({ user, channelId, channelName, dmId, onError }) => {
             }
             ws.current.send(JSON.stringify(data));
             setInputValue('');
-            sendTypingStatus(false);
         } else if (postImg && inputValue === '') {
             event.preventDefault();
 
@@ -154,6 +168,7 @@ export const TextChat = ({ user, channelId, channelName, dmId, onError }) => {
 
         if (event.key === 'Enter') {
             handleSendMessage(event);
+            sendTypingStatus(false);
         }
     };
 
@@ -212,10 +227,17 @@ export const TextChat = ({ user, channelId, channelName, dmId, onError }) => {
         <>
             <div id="messages-list">
                 {messages.slice().reverse().map((msg) => (
-                    <div key={msg.id} className={`message ${msg.type === 'TEXT' ? 'text-message' : 'file-message'}`}>
+                    <div key={msg.id} id={msg.id} className={`message-channel ${msg.type === 'TEXT' ? 'text-message' : 'file-message'}`}>
+                        {
+                            lastReadMessageId && lastReadMessageId === msg.id?
+                            <hr className="message-line-push"/> : <></>
+                        }
+                        <div className='message-info'>
                         <p>
                             {msg.username}&nbsp;&nbsp;<span className="timestamp">({msg.timestamp})</span>
                         </p>
+                        <div className='right' onClick={handleThread(msg.id, msg.contents)}>스레드</div>
+                        </div>
                         {msg.type === 'TEXT' ? (
                             <p>{msg.contents}</p>
                         ) : (
@@ -223,10 +245,11 @@ export const TextChat = ({ user, channelId, channelName, dmId, onError }) => {
                                 <img src={msg.contents} alt="chatImage"></img>
                             </a>
                         )}
-                        <hr className="message-line" />
+                        {/* <hr className="message-line"/> */}
                     </div>
                 ))}
             </div>
+
             <div className="msg-wrap">
                 <div className="send-chat">
                     {error && (

@@ -22,7 +22,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
             setSpaces(response.data);
         } catch (error) {
             console.error('Error fetching spaces:', error);
-            setError('Failed to load spaces');
+
         } finally {
             setLoading(false);
         }
@@ -73,7 +73,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
                 {!loading && !error && spaces.map((space) => (
                     <div
                         key={space.id}
-                        className="cir-btn"
+                        className="cir-btn add"
                         onClick={() => handleSpaceClick(space.id)}
                     >
                         <p>{space.spaceName}</p>
