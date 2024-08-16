@@ -3,7 +3,7 @@ import { WebSocketApi } from '../../api/websocket';
 import { useAxios } from '../../hook/useAxios';
 import './textChat.css';  // CSS 파일 임포트
 
-export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleThread, lastReadMessageId, setLastReadMessageId }) => {
+export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleThread, lastReadMessageId, setLastReadMessageId, onError }) => {
     const token = sessionStorage.getItem("accessToken");
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
@@ -106,6 +106,10 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
                 timestamp: formatDate(new Date(data.createdAt)),
                 type: data.type
             }]);
+        } else if (data.msg) {
+            setError(data.msg);
+            ws.current.close();
+            onError(data.msg); // 부모 컴포넌트에 에러를 전달
         }
     };
 
@@ -115,8 +119,9 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
 
     const handleSocketError = (error) => {
         // console.log('WebSocket error : ', error);
+        alert(error); // 에러 메시지를 알림으로 표시
+        setError(''); // 에러 메시지 초기화
     };
-
 
     const handleInputChange = (event) => {
         setInputValue(event.target.value);

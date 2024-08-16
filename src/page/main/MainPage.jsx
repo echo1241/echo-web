@@ -199,6 +199,12 @@ function MainPage() {
         }
     };
 
+    const handleError = (errorMessage) => {
+        alert(errorMessage);
+        setTextChatVisible(false);
+        setVideoCallVisible(false);
+    };
+    
     const setMainPageLastReadMessage = (lastReadMessageId) => {
         console.log("마지막에 읽은 messsageId: ", lastReadMessageId);
         setLastReadMessageId(lastReadMessageId);
@@ -285,7 +291,7 @@ function MainPage() {
 
                         <div className="chat-box cell">
                             {videoCallVisible && videoCallChannelId && (
-                                <VideoCall channelId={videoCallChannelId} user={user} />
+                                <VideoCall channelId={videoCallChannelId} user={user} onError={handleError} />
                             )}
                             {textChatVisible && <TextChat 
                                 user={user}
@@ -296,6 +302,7 @@ function MainPage() {
                                 dmId={textChatDmId}
                                 lastReadMessageId={lastReadMessageId}
                                 setLastReadMessageId={setLastReadMessageId}
+                                onError={handleError}
                             />}
                         </div>
                         {showUserList && (
