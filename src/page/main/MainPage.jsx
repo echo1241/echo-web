@@ -32,6 +32,7 @@ function MainPage() {
     const [dmList, setDmList] = useState([]); // DM 목록 상태 추가
     const [userList, setUserList] = useState([]); // 유저 목록 상태 추가
     const [showUserList, setShowUserList] = useState(false); // 유저 리스트 표시 상태 추가
+    const [lastReadMessageId, setLastReadMessageId] = useState(null);
     const { authenticationConnect } = useAxios();
 
     useEffect(() => {
@@ -198,6 +199,11 @@ function MainPage() {
         }
     };
 
+    const setMainPageLastReadMessage = (lastReadMessageId) => {
+        console.log("마지막에 읽은 messsageId: ", lastReadMessageId);
+        setLastReadMessageId(lastReadMessageId);
+    }
+
     return (
         <div className="main__wrap">
             <div className="social cell">
@@ -259,6 +265,7 @@ function MainPage() {
                                 spaceId={spaceId}
                                 onClose={handleCloseChannelManager}
                                 onClickChannel={handleChannelClick}
+                                setMainPageLastReadMessage={setMainPageLastReadMessage}
                             />
                         )}
 
@@ -287,6 +294,8 @@ function MainPage() {
                                 spaceId={spaceId} 
                                 handleThread={handleThread}
                                 dmId={textChatDmId}
+                                lastReadMessageId={lastReadMessageId}
+                                setLastReadMessageId={setLastReadMessageId}
                             />}
                         </div>
                         {showUserList && (
