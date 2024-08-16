@@ -24,6 +24,39 @@
     cursor: pointer;
 }
 
+.channel__plus-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.channel__plus-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+}
+
+.channel__plus-button {
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.channel-section {
+    margin-bottom: 20px;
+}
+
 .channel-list {
     display: flex;
     flex-direction: column;
@@ -32,7 +65,11 @@
 .channel-item {
     display: flex;
     align-items: center;
+    justify-content: space-between; /* 좌우 정렬을 맞추기 위해 추가 */
     margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #333; /* 채널 아이템 배경색 */
+    border-radius: 3px;
 }
 
 .channel-button {
@@ -42,24 +79,40 @@
     border-radius: 3px;
     cursor: pointer;
     text-align: left;
-    padding-right: 35px;
-    width: 220px;
+    padding-right: 15px;
+    width: 200px;
     word-break: break-all;
+}
+
+.channel-capacity {
+    color: #bbb;
+    margin-left: auto;
+    padding-left: 10px;
 }
 
 .channel-delete-button {
     background: transparent;
-    color: white;
+    color: #ff4d4d;
     border: none;
     border-radius: 3px;
     padding: 5px 10px;
     cursor: pointer;
 }
 
-.channel__plus-button {
-    right: 10px;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: transparent;
+.error {
+    color: #ff4d4d;
+}
+
+h2.channel__plus-text,
+h3 {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    margin: 0 0 10px 0;
+    padding-left: 10px; /* 좌측 정렬을 맞추기 위해 padding 추가 */
+}
+
+h3 {
+    margin-top: 30px;
+    margin-bottom: 10px;
 }

@@ -177,6 +177,12 @@ function MainPage() {
         }
     };
 
+    const handleError = (errorMessage) => {
+        alert(errorMessage);
+        setTextChatVisible(false);
+        setVideoCallVisible(false);
+    };
+
     return (
         <div className="main__wrap">
             <div className="social cell">
@@ -257,10 +263,10 @@ function MainPage() {
 
                         <div className="chat-box cell">
                             {videoCallVisible && videoCallChannelId && (
-                                <VideoCall channelId={videoCallChannelId} user={user} />
+                                <VideoCall channelId={videoCallChannelId} user={user} onError={handleError} />
                             )}
 
-                            {textChatVisible && < TextChat user={user} channelId={textChatChannelId} channelName={channelName} dmId={textChatDmId} />}
+                            {textChatVisible && < TextChat user={user} channelId={textChatChannelId} channelName={channelName} dmId={textChatDmId} onError={handleError} />}
                         </div>
                         {showUserList && (
                             <div className="user-list cell">

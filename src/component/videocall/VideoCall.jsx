@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { WebSocketApi } from '../../api/websocket';
 import './VideoCall.css';
 
-export const VideoCall = ({ channelId, user }) => {
+export const VideoCall = ({ channelId, user, onError }) => {
   let socket;
   let sessionId;
   let localStream;
@@ -13,6 +13,7 @@ export const VideoCall = ({ channelId, user }) => {
   const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const handleBeforeUnload = () => {
@@ -41,7 +42,7 @@ export const VideoCall = ({ channelId, user }) => {
     Object.values(peerConnections).forEach(pc => pc.close());
     peerConnections = {};
 
-    if (videoContainerRef.current){
+    if (videoContainerRef.current) {
       const remoteVideos = videoContainerRef.current.querySelectorAll('.video-wrapper');
       remoteVideos.forEach(videoWrapper => videoWrapper.remove());
 
@@ -50,9 +51,9 @@ export const VideoCall = ({ channelId, user }) => {
       }
 
       localVideoRef.current.srcObject = null;
-      
+
       processedStreams.clear();
-  }
+    }
   };
 
   const startCall = () => {
@@ -100,15 +101,30 @@ export const VideoCall = ({ channelId, user }) => {
       handleNewICECandidate(message.iceCandidate, message.from, message.to);
     } else if (message.leave) {
       handleLeave(message.leave);
+    } else if (message.msg) {
+      console.log("111111111");
+      handleMemberLimit(message.msg);
     }
   };
 
   const handleSocketClose = () => {
+    console.log("22222222");
     console.log("WebSocket 연결 끊김");
   };
 
+  const handleMemberLimit = (message) => {
+    console.log("333333333");
+    setError(message);
+    endCall();
+    socket.close();
+    onError(message); // 부모 컴포넌트에 에러를 전달
+  }
+
   const handleSocketError = (error) => {
+    console.log("44444444");
     console.error("WebSocket 오류: ", error);
+    alert(error); // 에러 메시지를 알림으로 표시
+    setError(''); // 에러 메시지 초기화
   };
 
   const handleMuteClick = () => {
