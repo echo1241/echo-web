@@ -23,16 +23,16 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel }) => {
     }, []);
 
     const handleOnMesaage = (event) => {
-
-        if (event.eventType === "CREATED") {
-            // 이전 데이터 
-            setChannels(prevChannels => [...prevChannels, event.data]);
-        } else if (event.eventType === "UPDATED") {
-            setChannels(prevChannels => prevChannels.map(channel => channel.id === event.data.id? event.data : channel));
-        } else if (event.eventType === "DELETED") {
-            setChannels(prevChannels => prevChannels.filter(channel => channel.id !== event.data.id));
+        if (event.notificationType === "CHANNEL") {
+            if (event.eventType === "CREATED") {
+                // 이전 데이터 
+                setChannels(prevChannels => [...prevChannels, event.data]);
+            } else if (event.eventType === "UPDATED") {
+                setChannels(prevChannels => prevChannels.map(channel => channel.id === event.data.id? event.data : channel));
+            } else if (event.eventType === "DELETED") {
+                setChannels(prevChannels => prevChannels.filter(channel => channel.id !== event.data.id));
+            }
         }
-
     }
 
     useEffect(() => {

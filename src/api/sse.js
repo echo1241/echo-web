@@ -30,9 +30,14 @@ export class EventSourceApi {
             return EventSourceApi.instance;
         }
         this.source = new EventSourcePolyfill(url, options);
+        this.source.onopen = this.onopen;
         this.source.onmessage = this.onmessage;
 
         EventSourceApi.instance = this;
+    }
+
+    onopen = (event) => {
+        console.log("sse start");
     }
 
     setOnMessage = handleOnMessage => {

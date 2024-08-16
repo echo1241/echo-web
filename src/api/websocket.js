@@ -44,6 +44,7 @@ export class WebSocketApi {
     }
 
     websocketStart = ({ url, handleSocketOpen, handleSocketMessage, handleSocketClose, handleSocketError }) => {
+        console.log('websocket API: url: ', url);
         const newSocket = new WebSocket(url);
         newSocket.onopen = this.socketOpen(handleSocketOpen);
         newSocket.onmessage = this.socketOnMessage(handleSocketMessage);
