@@ -163,6 +163,7 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
 
         if (event.key === 'Enter') {
             handleSendMessage(event);
+            sendTypingStatus(false);
         }
     };
 
