@@ -209,7 +209,7 @@ function MainPage() {
                                         })}
                                     </ul>
                                 ) : (
-                                    <p>No DMs available</p>
+                                    <p></p>
                                 )}
                             </div>
                         )}

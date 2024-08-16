@@ -22,7 +22,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
             setSpaces(response.data);
         } catch (error) {
             console.error('Error fetching spaces:', error);
-            setError('Failed to load spaces');
+
         } finally {
             setLoading(false);
         }
