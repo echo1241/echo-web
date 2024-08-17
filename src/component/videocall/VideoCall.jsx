@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { WebSocketApi } from '../../api/websocket';
 import './VideoCall.css';
 
-export const VideoCall = ({ channelId, user, onError }) => {
+export const VideoCall = ({ channelId, user, onError, onRefresh }) => {
   const socket = useRef(null);
   const sessionId = useRef(null);
   const localStream = useRef(null);
@@ -20,7 +20,7 @@ export const VideoCall = ({ channelId, user, onError }) => {
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (socket.current) {
-        socket.current.send(JSON.stringify({ leave: sessionId.current }));
+        socket.current.send(JSON.stringify({ leave: sessionId }));
         socket.current.close();
       }
     };
@@ -40,6 +40,22 @@ export const VideoCall = ({ channelId, user, onError }) => {
     };
   }, [channelId]);
 
+  const startCall = () => {
+    if (!channelId) return;
+
+    const host = process.env.REACT_APP_SERVER;
+    const url = `ws://${host}/video/${channelId}`;
+
+    const myWebSocket = new WebSocketApi(url, {
+      handleSocketOpen,
+      handleSocketMessage,
+      handleSocketClose,
+      handleSocketError
+    });
+
+    socket.current = myWebSocket.socket;
+  };
+
   const endCall = () => {
     Object.values(peerConnections.current).forEach(pc => pc.close());
     peerConnections.current = {};
@@ -56,22 +72,6 @@ export const VideoCall = ({ channelId, user, onError }) => {
 
       processedStreams.current.clear();
     }
-  };
-
-  const startCall = () => {
-    if (!channelId) return;
-
-    const host = process.env.REACT_APP_SERVER;
-    const url = `ws://${host}/video/${channelId}`;
-
-    const myWebSocket = new WebSocketApi(url, {
-      handleSocketOpen,
-      handleSocketMessage,
-      handleSocketClose,
-      handleSocketError
-    });
-
-    socket.current = myWebSocket.socket;
   };
 
   const handleSocketOpen = () => {
@@ -127,6 +127,18 @@ export const VideoCall = ({ channelId, user, onError }) => {
     setError(''); // 에러 메시지 초기화
   };
 
+  const handleRefresh = () => {
+    endCall();
+    console.log("00000102312839123189389712381");
+    if (socket.current) {
+      console.log("1111111111123123132131231");
+      socket.current.send(JSON.stringify({ leave: sessionId }));
+      console.log("22222122212122121121212121212112");
+      socket.current.close();
+    }
+    onRefresh();
+  }
+
   const handleMuteClick = () => {
     if (localStream.current) {
       localStream.current.getAudioTracks().forEach((track) => (track.enabled = !track.enabled));
@@ -143,14 +155,11 @@ export const VideoCall = ({ channelId, user, onError }) => {
 
   const handleScreenShareClick = async () => {
     if (sharingScreen) {
-      // 이미 화면 공유 중이라면 공유를 중지하고 기존 비디오 트랙을 복원합니다.
       screenStream.current.getTracks().forEach(track => track.stop());
 
-      // 원래 비디오 스트림을 가져옵니다.
       const userMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
       localStream.current = userMediaStream;
 
-      // PeerConnection에서 화면 공유 트랙을 원래의 비디오 트랙으로 대체합니다.
       const videoTrack = userMediaStream.getVideoTracks()[0];
       Object.values(peerConnections.current).forEach(pc => {
         const sender = pc.getSenders().find(s => s.track.kind === 'video');
@@ -163,10 +172,8 @@ export const VideoCall = ({ channelId, user, onError }) => {
       setSharingScreen(false);
     } else {
       try {
-        // 화면 공유를 시작합니다.
         const displayMediaStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'window' }, audio: true });
 
-        // 기존 비디오 트랙을 화면 공유 트랙으로 대체합니다.
         const videoTrack = displayMediaStream.getVideoTracks()[0];
         Object.values(peerConnections.current).forEach(pc => {
           const sender = pc.getSenders().find(s => s.track.kind === 'video');
@@ -312,12 +319,15 @@ export const VideoCall = ({ channelId, user, onError }) => {
         <div className="control-buttons">
           <button
             className={`btn btn-secondary ${muted ? "muteBtn" : "unmuteBtn"}`}
-            onClick={handleMuteClick}
-          >
+            onClick={handleMuteClick}>
           </button>
           <button
             className={`btn btn-secondary ${cameraOff ? "cameraOff" : "cameraOn"}`}
             onClick={handleCameraClick}>
+          </button>
+          <button
+            className="btn btn-secondary endCall"
+            onClick={handleRefresh}>
           </button>
         </div>
       </div>

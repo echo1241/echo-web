@@ -103,3 +103,11 @@ video {
   width:70px;
   height:45px;
 }
+
+.endCall{
+  background-color:transparent;
+  background-image: url('../../../public/images/media/exit.svg');
+  background-size: 70px 45px;
+  width:70px;
+  height:45px;
+}

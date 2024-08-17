@@ -204,6 +204,11 @@ function MainPage() {
         setTextChatVisible(false);
         setVideoCallVisible(false);
     };
+
+    const handleRefresh = () => {
+        setTextChatVisible(false);
+        setVideoCallVisible(false);
+    };
     
     const setMainPageLastReadMessage = (lastReadMessageId) => {
         console.log("마지막에 읽은 messsageId: ", lastReadMessageId);
@@ -291,7 +296,7 @@ function MainPage() {
 
                         <div className="chat-box cell">
                             {videoCallVisible && videoCallChannelId && (
-                                <VideoCall channelId={videoCallChannelId} user={user} onError={handleError} />
+                                <VideoCall channelId={videoCallChannelId} user={user} onError={handleError} onRefresh={handleRefresh} />
                             )}
                             {textChatVisible && <TextChat 
                                 user={user}
