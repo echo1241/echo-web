@@ -120,7 +120,7 @@ function Login() {
                 {error && <p className="login__error">{error}</p>}
 
                 <button type="submit" className="login__button">Login</button>
-                <button type="button" className="login__button" onClick={handleKakaoLogin}>
+                <button type="button" className="kakao__login__button" onClick={handleKakaoLogin}>
                     카카오로 로그인하기
                 </button>
 
