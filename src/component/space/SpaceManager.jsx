@@ -5,6 +5,7 @@ import Joinspace from '../../page/joinspace/Joinspace'; // 올바른 경로로 �
 import './SpaceManager.css';
 import { useAxios } from '../../hook/useAxios';
 
+
 const SpaceManager = ({ onAddClick, onDmClick }) => {
     const [spaces, setSpaces] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -13,6 +14,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
     const [joinspaceVisible, setJoinspaceVisible] = useState(false); // Joinspace 팝업 상태 추가
     const [name, setName] = useState('');
     const [publicStatus, setPublicStatus] = useState('Y');
+    const [selectedSpaceUUID, setSelectedSpaceUUID] = useState('');
 
     const { authenticationConnect } = useAxios();
 
@@ -51,9 +53,11 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
         }
     };
 
-    const handleSpaceClick = (id) => {
+    const handleSpaceClick = (id, uuid) => {
         console.log('Selected Space ID:', id);
         onAddClick(id);
+        setSelectedSpaceUUID(uuid)
+        console.log(uuid)
     };
 
     const handleUrlSubmit = async (uuid) => {
@@ -74,7 +78,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
                     <div
                         key={space.id}
                         className="cir-btn add"
-                        onClick={() => handleSpaceClick(space.id)}
+                        onClick={() => handleSpaceClick(space.id, space.uuid)}
                     >
                         <p>{space.spaceName}</p>
                     </div>
@@ -120,6 +124,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
                 <Joinspace
                     closePopup={() => setJoinspaceVisible(false)}
                     onSubmit={handleUrlSubmit}
+                    spaceUUID={selectedSpaceUUID}
                 />
             )}
         </>

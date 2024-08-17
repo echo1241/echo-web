@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import Popup from '../../component/modal/Popup';
 
-function Joinspace({ closePopup, onSubmit }) {
+function Joinspace({ closePopup, onSubmit, spaceUUID }) {
     const [url, setUrl] = useState('');
 
     const handleSubmit = (event) => {
@@ -19,7 +19,7 @@ function Joinspace({ closePopup, onSubmit }) {
             <h2>Enter Space UUID</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="url">Space UUID:</label>
+                    <label htmlFor="url">Space UUID:{spaceUUID}</label>
                     <input
                         type="text"
                         id="url"
