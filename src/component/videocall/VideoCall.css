@@ -55,9 +55,58 @@ video {
   width: 100%;
 }
 
-#muteBtn{
-  background-color: rebeccapurple;
-  background-image: url('../../../public/images/media/headphone-on.svg');
+.muteBtn{
+  background-color:transparent;
+  background-image: url('../../../public/images/media/mic-off.svg');
+  transform: scaleX(-1);
+  background-size: 70px 45px;
+  width:70px;
+  height:45px;
+}
+
+.unmuteBtn{
+  background-color:transparent;
+  background-image: url('../../../public/images/media/mic-on.svg');
+  background-size: 70px 45px;
+  width:70px;
+  height:45px;
+}
+
+.cameraOff{
+  background-color:transparent;
+  background-image: url('../../../public/images/media/video-off.svg');
+  background-size: 70px 45px;
+  width:70px;
+  height:45px;
+}
+
+.cameraOn{
+  background-color:transparent;
+  background-image: url('../../../public/images/media/video-on.svg');
+  background-size: 70px 45px;
+  width:70px;
+  height:45px;
+}
+
+.monitorBlack{
+  background-color:transparent;
+  background-image: url('../../../public/images/media/monitor-black.svg');
+  background-size: 70px 45px;
+  width:70px;
+  height:45px;
+}
+
+.monitorRed{
+  background-color:transparent;
+  background-image: url('../../../public/images/media/monitor-red.svg');
+  background-size: 70px 45px;
+  width:70px;
+  height:45px;
+}
+
+.endCall{
+  background-color:transparent;
+  background-image: url('../../../public/images/media/exit.svg');
   background-size: 70px 45px;
   width:70px;
   height:45px;
