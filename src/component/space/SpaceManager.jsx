@@ -15,6 +15,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
     const [name, setName] = useState('');
     const [publicStatus, setPublicStatus] = useState('Y');
     const [selectedSpaceUUID, setSelectedSpaceUUID] = useState('');
+    const [selectedSpaceId, setSelectedSpaceSpaceId] = useState(null)
 
     const { authenticationConnect } = useAxios();
 
@@ -54,10 +55,10 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
     };
 
     const handleSpaceClick = (id, uuid) => {
-        console.log('Selected Space ID:', id);
         onAddClick(id);
         setSelectedSpaceUUID(uuid)
-        console.log(uuid)
+        setSelectedSpaceSpaceId(id)
+
     };
 
     const handleUrlSubmit = async (uuid) => {
@@ -79,8 +80,9 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
                         key={space.id}
                         className="cir-btn add"
                         onClick={() => handleSpaceClick(space.id, space.uuid)}
+                        style={{backgroundColor: selectedSpaceId === space.id ? 'lightblue' :  'green'}} //입장한 스페이스 색깔 변경
                     >
-                        <p>{space.spaceName}</p>
+                        <p className={space.id}>{space.spaceName}</p>
                     </div>
                 ))}
                 {loading && <p>Loading...</p>}
