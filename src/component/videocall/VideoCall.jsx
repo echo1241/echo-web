@@ -6,10 +6,12 @@ export const VideoCall = ({ channelId, user, onError }) => {
   const socket = useRef(null);
   const sessionId = useRef(null);
   const localStream = useRef(null);
+  const screenStream = useRef(null);
   const peerConnections = useRef({});
   const processedStreams = useRef(new Set());
   const [muted, setMuted] = useState(false);
   const [cameraOff, setCameraOff] = useState(false);
+  const [sharingScreen, setSharingScreen] = useState(false);
   const configuration = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
   const localVideoRef = useRef();
   const videoContainerRef = useRef();
@@ -139,6 +141,51 @@ export const VideoCall = ({ channelId, user, onError }) => {
     }
   };
 
+  const handleScreenShareClick = async () => {
+    if (sharingScreen) {
+      // 이미 화면 공유 중이라면 공유를 중지하고 기존 비디오 트랙을 복원합니다.
+      screenStream.current.getTracks().forEach(track => track.stop());
+
+      // 원래 비디오 스트림을 가져옵니다.
+      const userMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+      localStream.current = userMediaStream;
+
+      // PeerConnection에서 화면 공유 트랙을 원래의 비디오 트랙으로 대체합니다.
+      const videoTrack = userMediaStream.getVideoTracks()[0];
+      Object.values(peerConnections.current).forEach(pc => {
+        const sender = pc.getSenders().find(s => s.track.kind === 'video');
+        if (sender) {
+          sender.replaceTrack(videoTrack);
+        }
+      });
+
+      localVideoRef.current.srcObject = userMediaStream;
+      setSharingScreen(false);
+    } else {
+      try {
+        // 화면 공유를 시작합니다.
+        const displayMediaStream = await navigator.mediaDevices.getDisplayMedia({ video: { displaySurface: 'window' }, audio: true });
+
+        // 기존 비디오 트랙을 화면 공유 트랙으로 대체합니다.
+        const videoTrack = displayMediaStream.getVideoTracks()[0];
+        Object.values(peerConnections.current).forEach(pc => {
+          const sender = pc.getSenders().find(s => s.track.kind === 'video');
+          if (sender) {
+            sender.replaceTrack(videoTrack);
+          }
+        });
+
+        screenStream.current = displayMediaStream;
+        localVideoRef.current.srcObject = displayMediaStream;
+        setSharingScreen(true);
+      } catch (error) {
+        console.error("화면 공유 오류: ", error);
+        alert("화면 공유를 시작할 수 없습니다.");
+      }
+    }
+  };
+
+
   const makePeerConnection = (id, nickname) => {
     console.log("PeerConnection 생성. from:", id);
     const peerConnection = new RTCPeerConnection(configuration);
@@ -230,18 +277,18 @@ export const VideoCall = ({ channelId, user, onError }) => {
   };
 
   const handleLeave = (id) => {
-    const peerConnection = peerConnections.current[id];
+    const peerConnection = peerConnections.current[id.current];
     if (peerConnection) {
-      console.log("RemoteVideo 종료: ", id);
+      console.log("RemoteVideo 종료: ", id.current);
       peerConnection.close();
-      delete peerConnections.current[id];
+      delete peerConnections.current[id.current];
 
-      const remoteVideoWrapper = document.querySelector(`.video-wrapper #remoteVideo_${id}`).parentNode;
+      const remoteVideoWrapper = document.querySelector(`.video-wrapper #remoteVideo_${id.current}`).parentNode;
       if (remoteVideoWrapper) {
         remoteVideoWrapper.remove();
       }
 
-      processedStreams.current.delete(id);
+      processedStreams.current.delete(id.current);
     }
   };
 
@@ -254,6 +301,10 @@ export const VideoCall = ({ channelId, user, onError }) => {
     <div className="video-call-container">
       <h1 className="mb-4">Echo Video Call</h1>
       <div className="button-container mb-4">
+        <button
+          className={`btn btn-secondary ${sharingScreen ? "monitorRed" : "monitorBlack"}`}
+          onClick={handleScreenShareClick}>
+        </button>
       </div>
       <div id="localContainer" className="video-wrapper">
         <video ref={localVideoRef} id="localVideo" autoPlay muted></video>
@@ -264,8 +315,9 @@ export const VideoCall = ({ channelId, user, onError }) => {
             onClick={handleMuteClick}
           >
           </button>
-          <button id="cameraBtn" className="btn btn-secondary" onClick={handleCameraClick}>
-            {cameraOff ? "Turn Camera On" : "Turn Camera Off"}
+          <button
+            className={`btn btn-secondary ${cameraOff ? "cameraOff" : "cameraOn"}`}
+            onClick={handleCameraClick}>
           </button>
         </div>
       </div>
