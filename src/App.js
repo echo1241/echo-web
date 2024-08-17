@@ -8,6 +8,7 @@ import Signup from "./page/signup/Signup";
 import { useEffect } from 'react';
 import ForgotPassword from "./page/passwordfind/ForgotPassword";
 import Oauth from "./page/oauth/Oauth";
+import MaintenancePage from './page/maintenance/MaintenancePage';
 
 function App() {
   
@@ -35,7 +36,7 @@ function App() {
       <Route path="/main" element={<MainPage />}></Route>
       <Route path="/passwordfind" element={<ForgotPassword/>}></Route>
       <Route path="/oauth/kakao/callback" element={<Oauth/>}></Route>
-
+      <Route path="/maintenance" element={<MaintenancePage/>}></Route>
 
     </Routes>
   </BrowserRouter>

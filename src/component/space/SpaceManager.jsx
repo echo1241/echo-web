@@ -5,6 +5,7 @@ import Joinspace from '../../page/joinspace/Joinspace'; // 올바른 경로로 �
 import './SpaceManager.css';
 import { useAxios } from '../../hook/useAxios';
 
+
 const SpaceManager = ({ onAddClick, onDmClick }) => {
     const [spaces, setSpaces] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -13,6 +14,8 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
     const [joinspaceVisible, setJoinspaceVisible] = useState(false); // Joinspace 팝업 상태 추가
     const [name, setName] = useState('');
     const [publicStatus, setPublicStatus] = useState('Y');
+    const [selectedSpaceUUID, setSelectedSpaceUUID] = useState('');
+    const [selectedSpaceId, setSelectedSpaceSpaceId] = useState(null)
 
     const { authenticationConnect } = useAxios();
 
@@ -51,9 +54,11 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
         }
     };
 
-    const handleSpaceClick = (id) => {
-        console.log('Selected Space ID:', id);
+    const handleSpaceClick = (id, uuid) => {
         onAddClick(id);
+        setSelectedSpaceUUID(uuid)
+        setSelectedSpaceSpaceId(id)
+
     };
 
     const handleUrlSubmit = async (uuid) => {
@@ -74,9 +79,10 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
                     <div
                         key={space.id}
                         className="cir-btn add"
-                        onClick={() => handleSpaceClick(space.id)}
+                        onClick={() => handleSpaceClick(space.id, space.uuid)}
+                        style={{backgroundColor: selectedSpaceId === space.id ? 'lightblue' :  'green'}} //입장한 스페이스 색깔 변경
                     >
-                        <p>{space.spaceName}</p>
+                        <p className={space.id}>{space.spaceName}</p>
                     </div>
                 ))}
                 {loading && <p>Loading...</p>}
@@ -120,6 +126,7 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
                 <Joinspace
                     closePopup={() => setJoinspaceVisible(false)}
                     onSubmit={handleUrlSubmit}
+                    spaceUUID={selectedSpaceUUID}
                 />
             )}
         </>
