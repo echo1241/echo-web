@@ -5,26 +5,29 @@ import './textChat.css';  // CSS 파일 임포트
 
 export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleThread, lastReadMessageId, setLastReadMessageId, onError }) => {
     const token = sessionStorage.getItem("accessToken");
+    const [editMode, setEditMode] = useState(null);
     const [messages, setMessages] = useState([]);
     const [inputValue, setInputValue] = useState('');
+    const [modifyValue, setModifyValue] = useState('');
     const [postImg, setPostImg] = useState([]);
     const [previewImgUrl, setPreviewImgUrl] = useState(null);
     const [error, setError] = useState('');
     const [isChatTextDisabled, setIsChatTextDisabled] = useState(false);
     const [typingUsers, setTypingUsers] = useState(new Set()); // 여러 사용자의 타이핑 상태를 관리
+    const [chatTextPlaceHolder, setChatTextPlaceHolder] = useState(null);
     const fileRef = useRef(null);
     const ws = useRef(null);
 
     const { authenticationConnect } = useAxios();
 
     useEffect(() => {
-        if (lastReadMessageId){
+        if (lastReadMessageId) {
             console.log(lastReadMessageId);
-                const element = document.getElementById(lastReadMessageId);
-                if (element) {
-                    console.log("스크롤 이동?");
-                  element.scrollIntoView({ behavior: 'smooth' });
-                }
+            const element = document.getElementById(lastReadMessageId);
+            if (element) {
+                console.log("스크롤 이동?");
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
         }
         // 새로운 메시지 정보는 2초 후에 삭제하도록 함
         setTimeout(() => {
@@ -38,6 +41,7 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
             setTypingUsers(new Set());
             setInputValue('');
             connectWebSocket(channelId, dmId);
+            setChatTextPlaceHolder(`${channelName}에 메시지 보내기`);
         }
 
         return () => {
@@ -83,33 +87,45 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
     const handleSocketMessage = (event) => {
 
         const data = JSON.parse(event.data);
+        console.log(data)
 
-        if (data.typing && data.username !== user.nickname) {
-            setTypingUsers(prev => {
-                const updated = new Set(prev);
-                updated.add(data.username)  // 타이핑 중인 사용자 추가
-                return updated;
-            });
-        } else if (data.typing === false) {
-            setTypingUsers(prev => {
-                const updated = new Set(prev);
-                updated.delete(data.username); // 타이핑 중지된 사용자 제거
-                return updated;
-            });
-        }
+        if (data.handleType === "CREATED" || data.handleType === null) {
+            if (data.typing && data.username !== user.nickname) {
+                setTypingUsers(prev => {
+                    const updated = new Set(prev);
+                    updated.add(data.username)  // 타이핑 중인 사용자 추가
+                    return updated;
+                });
+            } else if (data.typing === false) {
+                setTypingUsers(prev => {
+                    const updated = new Set(prev);
+                    updated.delete(data.username); // 타이핑 중지된 사용자 제거
+                    return updated;
+                });
+            }
 
-        if (data.contents) {
-            setMessages(prevMessages => [...prevMessages, {
-                id: data.id,
-                username: data.username,
-                contents: data.contents,
-                timestamp: formatDate(new Date(data.createdAt)),
-                type: data.type
-            }]);
-        } else if (data.msg) {
-            setError(data.msg);
-            ws.current.close();
-            onError(data.msg); // 부모 컴포넌트에 에러를 전달
+            if (data.contents) {
+                setMessages(prevMessages => [...prevMessages, {
+                    id: data.id,
+                    username: data.username,
+                    contents: data.contents,
+                    createdAt: formatDate(new Date(data.createdAt)),
+                    modifiedAt: formatDate(new Date(data.modifiedAt)),
+                    modifiedStatus: data.createdAt === data.modifiedAt,
+                    type: data.textType
+                }]);
+            } else if (data.msg) {
+                setError(data.msg);
+                ws.current.close();
+                onError(data.msg); // 부모 컴포넌트에 에러를 전달
+            }
+        } else if (data.handleType === "UPDATED") {
+            setMessages(prevMessages => prevMessages.map(message => message.id === data.id
+                ? { ...message, contents: data.contents, modifiedStatus: data.createdAt === data.modifiedAt }
+                : message));
+            console.log(messages);
+        } else if (data.handleType === "DELETED") {
+            setMessages(prevMessages => prevMessages.filter(message => message.id !== data.id));
         }
     };
 
@@ -133,6 +149,10 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
         }
     };
 
+    const handleModifyChange = (event) => {
+        setModifyValue(event.target.value);
+    };
+
     const sendTypingStatus = (isTyping) => {
         if (ws.current) {
             const data = {
@@ -149,7 +169,7 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
             }
             ws.current.send(JSON.stringify(data));
             setInputValue('');
-        } else if (postImg && inputValue === '') {
+        } else if (postImg !== '' && inputValue === '') {
             event.preventDefault();
 
             const formData = new FormData();
@@ -158,10 +178,23 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
             await authenticationConnect('post', `/text/${channelId}/file`, formData);
             setPreviewImgUrl(null);
             setIsChatTextDisabled(false);
+            setChatTextPlaceHolder(`${channelName}에 메시지 보내기`);
         }
-    };
+    }
 
-    const handleKeyPress = (event) => {
+    const handleModifyMessage = async (event) => {
+
+        if (modifyValue.trim()) {
+            const data = {
+                contents: modifyValue
+            }
+            await authenticationConnect('put', `/text/${editMode}`, modifyValue);
+            setEditMode(null)
+        }
+    }
+
+
+    const handleSendKeyPress = (event) => {
         if (event.isComposing || event.keyCode === 229) {
             return;
         }
@@ -170,7 +203,19 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
             handleSendMessage(event);
             sendTypingStatus(false);
         }
-    };
+    }
+
+    const handleModifyKeyPress = (event) => {
+        if (event.isComposing || event.keyCode === 229) {
+            return;
+        }
+
+        if (event.key === 'Enter') {
+            handleModifyMessage(event);
+        } else if (event.key === 'Escape') {
+            setEditMode(null);
+        }
+    }
 
     function formatDate(date) {
         const year = date.getFullYear();
@@ -215,12 +260,31 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
             setPreviewImgUrl(fileUrl);
             setError('');
             setIsChatTextDisabled(true);
+            setChatTextPlaceHolder('이미지 전송 후 메시지 전송이 가능합니다');
         }
     }
 
     const handleImgDeleteClick = () => {
         setPreviewImgUrl(null);
         setIsChatTextDisabled(false);
+        setChatTextPlaceHolder(`${channelName}에 메시지 보내기`);
+    }
+
+    const handleToggleEdit = (msgId, currentContents) => {
+        if (editMode === msgId) {
+            setEditMode(null);
+        } else {
+            setEditMode(msgId);
+            setModifyValue(currentContents);
+            console.log(msgId);
+        }
+    };
+
+    const handleDeleteText = async (msgId) => {
+        const confirmDeleteText = window.confirm("정말 이 메시지를 삭제할까요?");
+        if (confirmDeleteText) {
+            await authenticationConnect('delete', `/text/${channelId}/${msgId}`);
+        }
     }
 
     return (
@@ -229,17 +293,46 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
                 {messages.slice().reverse().map((msg) => (
                     <div key={msg.id} id={msg.id} className={`message-channel ${msg.type === 'TEXT' ? 'text-message' : 'file-message'}`}>
                         {
-                            lastReadMessageId && lastReadMessageId === msg.id?
-                            <hr className="message-line-push"/> : <></>
+                            lastReadMessageId && lastReadMessageId === msg.id ?
+                                <hr className="message-line-push" /> : <></>
                         }
                         <div className='message-info'>
-                        <p>
-                            {msg.username}&nbsp;&nbsp;<span className="timestamp">({msg.timestamp})</span>
-                        </p>
-                        <div className='right' onClick={handleThread(msg.id, msg.contents)}>스레드</div>
+                            <p>
+                                {msg.username}&nbsp;&nbsp;<span className="createdAt">({msg.createdAt})</span>
+                            </p>
+                            <div className='message-option'>
+                                <div className='right' onClick={handleThread(msg.id, msg.contents)}>스레드</div>
+                                {msg.type === 'TEXT' && (
+                                    <div className='right' onClick={() => handleToggleEdit(msg.id, msg.contents)}>수정</div>
+                                )}
+                                <div className='right' onClick={() => handleDeleteText(msg.id)}>삭제</div>
+                            </div>
                         </div>
                         {msg.type === 'TEXT' ? (
-                            <p>{msg.contents}</p>
+                            editMode === msg.id ? (
+                                <div>
+                                    <input
+                                        type="text"
+                                        className="modify-text"
+                                        value={modifyValue}
+                                        onChange={handleModifyChange}
+                                        onKeyDown={handleModifyKeyPress}
+                                        autoFocus
+                                    />
+                                </div>
+                            ) : (
+                                msg.modifiedStatus ? (
+                                    <p>{msg.contents}</p>
+                                ) : (
+                                    <p>
+                                        {msg.contents}
+                                        <span className="edited">수정됨
+                                            <span className="modifiedAt">{msg.modifiedAt}</span>
+                                        </span>
+
+                                    </p>
+                                )
+                            )
                         ) : (
                             <a href={msg.contents} target="_blank" rel="noopener noreferrer">
                                 <img src={msg.contents} alt="chatImage"></img>
@@ -271,10 +364,10 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
                         </div>
                         <input type="text"
                             className="chat-text"
-                            placeholder={`${channelName}에 메시지 보내기`}
+                            placeholder={chatTextPlaceHolder}
                             value={inputValue}
                             onChange={handleInputChange}
-                            onKeyDown={handleKeyPress}
+                            onKeyDown={handleSendKeyPress}
                             disabled={isChatTextDisabled}
                         />
                         <button className="send icon cell" onClick={handleSendMessage}></button>
