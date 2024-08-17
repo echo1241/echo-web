@@ -169,7 +169,7 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
             }
             ws.current.send(JSON.stringify(data));
             setInputValue('');
-        } else if (postImg !== '' && inputValue === '') {
+        } else if (postImg && inputValue === '') {
             event.preventDefault();
 
             const formData = new FormData();

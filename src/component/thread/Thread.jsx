@@ -115,6 +115,10 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
     }
 
     const handleKeyPress = event => {
+        if (event.isComposing || event.keyCode === 229) {
+            return;
+        }
+
         if (event.key === 'Enter') {
             // 스레드 생성
             const content = textInputRef.current.value;
