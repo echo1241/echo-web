@@ -129,11 +129,8 @@ export const VideoCall = ({ channelId, user, onError, onRefresh }) => {
 
   const handleRefresh = () => {
     endCall();
-    console.log("00000102312839123189389712381");
     if (socket.current) {
-      console.log("1111111111123123132131231");
       socket.current.send(JSON.stringify({ leave: sessionId }));
-      console.log("22222122212122121121212121212112");
       socket.current.close();
     }
     onRefresh();
@@ -183,6 +180,7 @@ export const VideoCall = ({ channelId, user, onError, onRefresh }) => {
         });
 
         screenStream.current = displayMediaStream;
+        localStream.current = displayMediaStream;
         localVideoRef.current.srcObject = displayMediaStream;
         setSharingScreen(true);
       } catch (error) {
