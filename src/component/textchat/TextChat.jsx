@@ -3,10 +3,9 @@ import { WebSocketApi } from '../../api/websocket';
 import { useAxios } from '../../hook/useAxios';
 import './textChat.css';  // CSS 파일 임포트
 
-export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleThread, lastReadMessageId, setLastReadMessageId, onError }) => {
+export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleThread, lastReadMessageId, setLastReadMessageId, onError, messages, setMessages }) => {
     const token = sessionStorage.getItem("accessToken");
-    const [editMode, setEditMode] = useState(null);
-    const [messages, setMessages] = useState([]);
+    const [editMessage, setEditMessage] = useState(null);
     const [inputValue, setInputValue] = useState('');
     const [modifyValue, setModifyValue] = useState('');
     const [postImg, setPostImg] = useState([]);
@@ -176,6 +175,7 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
             formData.append('file-data', postImg);
 
             await authenticationConnect('post', `/text/${channelId}/file`, formData);
+            setPostImg(null);
             setPreviewImgUrl(null);
             setIsChatTextDisabled(false);
             setChatTextPlaceHolder(`${channelName}에 메시지 보내기`);
@@ -188,8 +188,8 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
             const data = {
                 contents: modifyValue
             }
-            await authenticationConnect('put', `/text/${editMode}`, modifyValue);
-            setEditMode(null)
+            await authenticationConnect('put', `/text/${editMessage}`, modifyValue);
+            setEditMessage(null)
         }
     }
 
@@ -213,7 +213,7 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
         if (event.key === 'Enter') {
             handleModifyMessage(event);
         } else if (event.key === 'Escape') {
-            setEditMode(null);
+            setEditMessage(null);
         }
     }
 
@@ -271,10 +271,10 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
     }
 
     const handleToggleEdit = (msgId, currentContents) => {
-        if (editMode === msgId) {
-            setEditMode(null);
+        if (editMessage === msgId) {
+            setEditMessage(null);
         } else {
-            setEditMode(msgId);
+            setEditMessage(msgId);
             setModifyValue(currentContents);
             console.log(msgId);
         }
@@ -309,7 +309,7 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
                             </div>
                         </div>
                         {msg.type === 'TEXT' ? (
-                            editMode === msg.id ? (
+                            editMessage === msg.id ? (
                                 <div>
                                     <input
                                         type="text"

@@ -21,7 +21,7 @@ function MainPage() {
     const [videoCallChannelId, setVideoCallChannelId] = useState(null); // 화상 통화 채널 ID
     const [textChatVisible, setTextChatVisible] = useState(false); // 텍스트 채팅 가시성 상태
     const [textChatChannelId, setTextChatChannelId] = useState(null); // 텍스트 채팅 채널 ID
-    const [textChannelName, setTextChatChannelName] = useState(null); // 텍스트 채팅 채널 이름
+    const [messages, setMessages] = useState([]);
     const [threadVisible, setThreadVisible] = useState(false); // 스레드 가시성 상태
     const [threadTextInfo, setThreadTextInfo] = useState(null); // 스레드에 보낼 텍스트 정보
     const [textChatDmId, setTextChatDmId] = useState(null); // DM ID 상태 추가
@@ -277,6 +277,9 @@ function MainPage() {
                                 onClose={handleCloseChannelManager}
                                 onClickChannel={handleChannelClick}
                                 setMainPageLastReadMessage={setMainPageLastReadMessage}
+                                setMessages={setMessages}
+                                setTextChatVisible={setTextChatVisible}
+                                setTopChannelName={setChannelName}
                             />
                         )}
 
@@ -308,6 +311,8 @@ function MainPage() {
                                 lastReadMessageId={lastReadMessageId}
                                 setLastReadMessageId={setLastReadMessageId}
                                 onError={handleError}
+                                messages={messages}
+                                setMessages={setMessages}
                             />}
                         </div>
                         {showUserList && (

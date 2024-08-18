@@ -4,7 +4,7 @@ import { useAxios } from '../../hook/useAxios';
 import Popup from '../modal/Popup';
 import './channelManager.css'; // CSS 파일 임포트
 
-const ChannelManager = ({ spaceId, onClose, onClickChannel, setMainPageLastReadMessage }) => {
+const ChannelManager = ({ spaceId, onClose, onClickChannel, setMainPageLastReadMessage, setMessages, setTextChatVisible, setTopChannelName }) => {
     const [channels, setChannels] = useState([]);  // 채널 목록 상태
     const [loading, setLoading] = useState(true);  // 로딩 상태
     const [error, setError] = useState('');  // 오류 상태
@@ -36,6 +36,9 @@ const ChannelManager = ({ spaceId, onClose, onClickChannel, setMainPageLastReadM
                 setChannels(prevChannels => prevChannels.map(channel => channel.id === event.data.id ? event.data : channel));
             } else if (event.eventType === "DELETED") {
                 setChannels(prevChannels => prevChannels.filter(channel => channel.id !== event.data.id));
+                setTextChatVisible(false);
+                setTopChannelName('');
+                setMessages([]);
             }
         } else if (event.notificationType === "TEXT") {
             if (event.eventType === "CREATED") {
