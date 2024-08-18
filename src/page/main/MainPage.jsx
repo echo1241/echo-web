@@ -317,11 +317,11 @@ function MainPage() {
                         </div>
                         {showUserList && (
                             <div className="user-list cell">
-                                <h3>스페이스 내 유저 목록</h3>
+                                <h3>스페이스에<br/>입장한<br/>유저 목록</h3>
                                 {userList.length > 0 ? (
                                     <ul>
                                         {userList.map(user => (
-                                            <li key={user.id}>{user.nickname}</li>
+                                            <li className='space-user-name' key={user.id}>{user.nickname}</li>
                                         ))}
                                     </ul>
                                 ) : (
