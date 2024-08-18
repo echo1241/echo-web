@@ -114,10 +114,6 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
                     modifiedStatus: data.createdAt === data.modifiedAt,
                     type: data.textType
                 }]);
-            } else if (data.msg) {
-                setError(data.msg);
-                ws.current.close();
-                onError(data.msg); // 부모 컴포넌트에 에러를 전달
             }
         } else if (data.handleType === "UPDATED") {
             setMessages(prevMessages => prevMessages.map(message => message.id === data.id
@@ -126,6 +122,10 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
             console.log(messages);
         } else if (data.handleType === "DELETED") {
             setMessages(prevMessages => prevMessages.filter(message => message.id !== data.id));
+        } else if (data.msg) {
+            setError(data.msg);
+            ws.current.close();
+            onError(data.msg); // 부모 컴포넌트에 에러를 전달
         }
     };
 
