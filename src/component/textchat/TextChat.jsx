@@ -221,7 +221,7 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
         const dbDate = new Date(date);
         const localTime = new Date(dbDate.getTime() - dbDate.getTimezoneOffset() * 60000);
 
-        const year = localTime.getYear();
+        const year = localTime.getFullYear();
         const month = String(localTime.getMonth() + 1).padStart(2, '0');
         const day = String(localTime.getDate()).padStart(2, '0');
         const hours = localTime.getHours();
