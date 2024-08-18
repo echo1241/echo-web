@@ -17,6 +17,7 @@
   width: 100%;
   height: calc(100% - 150px);
   box-sizing: border-box;
+  overflow: auto;
 }
 
 .video-wrapper {
