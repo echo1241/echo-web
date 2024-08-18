@@ -19,9 +19,9 @@ async function sendAxiosRequest(method, uri, data, headers, navigate) {
             console.log("토큰이 만료되었습니다.");
             sessionStorage.clear();
             navigate('/login');
-        } else if (e?.response?.status === 500) {
+        } else if (e?.code === 'ERR_NETWORK') {
             navigate('/maintenance');
-        }   
+        } 
         throw e;
     }
 }
