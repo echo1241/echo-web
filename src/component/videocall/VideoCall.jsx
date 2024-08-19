@@ -144,7 +144,7 @@ export const VideoCall = ({ channelId, user, onError, onRefresh }) => {
   };
 
   const handleCameraClick = () => {
-    if (localStream.current) {
+    if (localStream.current && !sharingScreen) {
       localStream.current.getVideoTracks().forEach((track) => (track.enabled = !track.enabled));
       setCameraOff(prevCameraOff => !prevCameraOff);
     }

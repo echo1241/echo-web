@@ -81,6 +81,7 @@ function MainPage() {
     const handleAddClick = (id) => {
         setSpaceId(id); // 스페이스 ID 설정
         setDmVisible(false);
+        setTextChatVisible(false);
         setShowAddButton(true); // 버튼을 보이게 설정
         setShowChannelManager(true); // 채널 매니저 보이기 설정
         setShowUserList(true); // 유저 리스트 보이기 설정
