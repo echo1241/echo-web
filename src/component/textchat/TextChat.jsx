@@ -44,7 +44,9 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
         }
 
         return () => {
-            authenticationConnect('delete', `/notice/${channelId}`);
+            if (channelId){
+                authenticationConnect('delete', `/notice/${channelId}`);
+            }
 
             if (ws) {
                 ws.current.close();
