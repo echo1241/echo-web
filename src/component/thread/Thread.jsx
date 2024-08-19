@@ -15,9 +15,12 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
 
     const firstTextRef = useRef(null);
 
+    const defaultPlaceHoderText = "메시지를 입력하면 대화가 시작돼요!";
+
     const basicThreadUrl = `/spaces/${spaceId}/channels/${channelId}/texts/${threadTextInfo.textId}/threads`;
 
     useEffect(() => {
+        threadTextInfo.text = threadTextInfo.type == 'TEXT'? threadTextInfo.text : '사진';
         // 스레드가 변경될 때마다 소켓을 끊어준다.
         if (websocketRef.current !== null) {
             websocketRef.current.close();
@@ -28,7 +31,7 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
         const getThreads = async () => {
             const response = await authenticationConnect('get', basicThreadUrl);
             if (response.data === "") {
-                setTextInputMessage('메시지를 입력하면 대화가 시작돼요!');
+                setTextInputMessage(defaultPlaceHoderText);
                 return;
             }
     
@@ -39,7 +42,7 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
             startThreadSession();
         }
         setMessages([]);
-        setTextInputMessage('메시지를 입력하면 대화가 시작돼요!');
+        setTextInputMessage(defaultPlaceHoderText);
         getThreads();
 
         return () => {
@@ -51,7 +54,7 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
     
     const startThread = async () =>  {
         // 스레드 시작을 위해서 스레드를 생성한다.
-        console.log("스레드 시작");
+
         const content = textInputRef.current.value;
         try {
             const response = await authenticationConnect('post', basicThreadUrl);
@@ -72,8 +75,6 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
     }
 
     const startThreadSession = () => {
-        // 웹소켓 세션을 시작하는데...... 흠... 뭘하지?
-        // 일단 url 만들고./.
         const threadId = threadIdRef.current;
 
         const host = process.env.REACT_APP_SERVER;
@@ -85,13 +86,10 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
             handleSocketError: threadSocketOnError
         });
 
-        // 각 스레드에 대한 세션? 이라고 할 수 있겠지?
-
         websocketRef.current = socket.socket;
     }
 
     const threadSocketOpen = event => {
-        console.log("스레드 소켓 연결완료");
         if (firstTextRef.current){
             websocketRef.current.send(JSON.stringify(firstTextRef.current));
             firstTextRef.current = null;
@@ -100,17 +98,14 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
 
     const threadSocketOnMessage = event => {
         const data = JSON.parse(event.data);
-        console.log(data);
         setMessages(prevMessages => [...prevMessages, data]);
     }
 
     const threadSocketOnClose = () => {
-        console.log("스레드 소켓 연결 끊김");
         websocketRef.current = null;
     }
 
     const threadSocketOnError = (error) => {
-        console.log("스레드 소켓 에러로 인해 연결 끊김", error);
         websocketRef.current = null;
     }
 
@@ -123,9 +118,9 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
             // 스레드 생성
             const content = textInputRef.current.value;
             if (threadIdRef.current == null) {
-                console.log('스레드 세션을 시작합니다.');
                 startThread();
                 textInputRef.current.value = '';
+                setTextInputMessage(`${threadTextInfo.text}에 메시지 보내기`);
                 return;
             }
             textInputRef.current.value = '';
@@ -143,7 +138,6 @@ function Thread({threadTextInfo, spaceId, channelId, channelName, closeThread}) 
         <>
         {/* top */}
         <div className="thread-top">
-            {/* 상단에 X 버튼이 있어야 함 */}
             <p># {channelName} > {threadTextInfo.text}</p>
             <div>
                 <p className="thread-top-close" onClick={closeThread}>X</p>

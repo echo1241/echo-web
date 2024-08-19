@@ -301,7 +301,7 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
                                 {msg.username}&nbsp;&nbsp;<span className="createdAt">({msg.createdAt})</span>
                             </p>
                             <div className='message-option'>
-                                <div className='right' onClick={handleThread(msg.id, msg.contents)}>스레드</div>
+                                <div className='right' onClick={handleThread(msg.id, msg.contents, msg.type)}>스레드</div>
                                 {msg.type === 'TEXT' && (
                                     <div className='right' onClick={() => handleToggleEdit(msg.id, msg.contents)}>수정</div>
                                 )}
