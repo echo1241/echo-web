@@ -145,7 +145,10 @@ function MainPage() {
 
     const handleChannelClick = (channel) => {
         setChannelName(channel.channelName);
-        console.log(channel.channelType)
+        // console.log(channel.channelType)
+        
+        // 채널 변경 시 스레드 닫아줌
+        setThreadVisible(false);
 
         if (channel.channelType === 'V') {
             setVideoCallChannelId(channel.id);
@@ -160,14 +163,15 @@ function MainPage() {
         }
     };
 
-    const handleThread = (textId, text) => e => {
-        console.log(textId);
-        console.log(text);
+    const handleThread = (textId, text, type) => e => {
+        // console.log(textId);
+        // console.log(text);
         setThreadVisible(false);
         setThreadVisible(true);
         setThreadTextInfo({
             text,
-            textId
+            textId,
+            type
         });
     }
 
