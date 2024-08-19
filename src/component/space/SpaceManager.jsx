@@ -1,5 +1,5 @@
 // src/component/space/SpaceManager.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Popup from '../modal/Popup';
 import Joinspace from '../../page/joinspace/Joinspace'; // 올바른 경로로 수정
 import './SpaceManager.css';
@@ -71,16 +71,23 @@ const SpaceManager = ({ onAddClick, onDmClick }) => {
         }
     };
 
+    const handleOnSelect = () => {
+        setSelectedSpaceSpaceId('dm');
+        onDmClick();
+    }
+
     return (
         <>
             <div className="add-wrap">
-                <div className="DM add" onClick={onDmClick}>DM</div>
+                <div className="DM add" onClick={handleOnSelect}
+                    style={{ backgroundColor: selectedSpaceId === 'dm' ? 'lightblue' : 'green' }}
+                >DM</div>
                 {!loading && !error && spaces.map((space) => (
                     <div
                         key={space.id}
                         className="cir-btn add"
                         onClick={() => handleSpaceClick(space.id, space.uuid)}
-                        style={{backgroundColor: selectedSpaceId === space.id ? 'lightblue' :  'green'}} //입장한 스페이스 색깔 변경
+                        style={{ backgroundColor: selectedSpaceId === space.id ? 'lightblue' : 'green' }} //입장한 스페이스 색깔 변경
                     >
                         <p className={space.id}>{space.spaceName}</p>
                     </div>
