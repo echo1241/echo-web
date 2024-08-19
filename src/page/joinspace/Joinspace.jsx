@@ -19,7 +19,7 @@ function Joinspace({ closePopup, onSubmit, spaceUUID }) {
             <h2>Enter Space UUID</h2>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="url">Space UUID:{spaceUUID}</label>
+                    <label htmlFor="url">Space UUID:<br/>{spaceUUID}</label>
                     <input
                         type="text"
                         id="url"

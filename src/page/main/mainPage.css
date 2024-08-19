@@ -128,6 +128,54 @@ html{
     bottom:0px;
 }
 
+.dm-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.dm-text {
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+    margin: 0;
+}
+
+.email-button {
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.dm-list-user {
+    color: rgb(114, 114, 114); /* 텍스트 색상 */
+    font-weight: bold; /* 텍스트 굵게 */
+    font-size: 1.1rem; /* 폰트 크기 조정 */
+    padding: 5px 15px; /* 텍스트 주변에 패딩 추가 */
+    border-radius: 8px; /* 둥근 모서리 추가 */
+    transition: all 0.3s ease; /* 모든 변화를 부드럽게 전환 */
+    text-decoration: none; /* 텍스트 밑줄 제거 */
+}
+
+.dm-list-user:hover {
+    color: white; /* 마우스 오버 시 텍스트 색상 변경 */
+    background-color: #007bff; /* 마우스 오버 시 배경 색상 변경 */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* 마우스 오버 시 약간의 그림자 추가 */
+    transform: translateY(-2px); /* 마우스 오버 시 텍스트가 살짝 위로 이동 */
+}
+
 .chat{
     width:83%;
     height:100%;

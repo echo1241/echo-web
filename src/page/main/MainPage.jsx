@@ -227,8 +227,8 @@ function MainPage() {
                         <hr className="line"></hr>
 
                         {dmVisible && (
-                            <div className="dm-text">
-                                DM
+                            <div className="dm-container">
+                                <h3 className="dm-text">DM</h3>
                                 <button className="email-button" onClick={() => setReceiverEmailPopupVisible(true)}>+</button>
                             </div>
                         )}
@@ -240,7 +240,7 @@ function MainPage() {
                                         {dmList.map(dm => {
                                             const nickname = user.id === dm.senderId ? dm.receiver : dm.sender;
                                             return (
-                                                <li key={dm.id} onClick={() => handleDmItemClick(dm.id, nickname)}>
+                                                <li className="dm-list-user" key={dm.id} onClick={() => handleDmItemClick(dm.id, nickname)}>
                                                     {nickname}
                                                 </li>
                                             )
