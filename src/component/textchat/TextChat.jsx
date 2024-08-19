@@ -108,15 +108,15 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
                     id: data.id,
                     username: data.username,
                     contents: data.contents,
-                    createdAt: formatDate(data.createdAt),
-                    modifiedAt: formatDate(data.modifiedAt),
+                    createdAt: formatDate(new Date(data.createdAt)),
+                    modifiedAt: formatDate(new Date(data.modifiedAt)),
                     modifiedStatus: data.createdAt === data.modifiedAt,
                     type: data.textType
                 }]);
             }
         } else if (data.handleType === "UPDATED") {
             setMessages(prevMessages => prevMessages.map(message => message.id === data.id
-                ? { ...message, contents: data.contents, modifiedStatus: data.createdAt === data.modifiedAt, modifiedAt: formatDate(data.modifiedAt) }
+                ? { ...message, contents: data.contents, modifiedStatus: data.createdAt === data.modifiedAt }
                 : message));
             console.log(messages);
         } else if (data.handleType === "DELETED") {
@@ -218,14 +218,11 @@ export const TextChat = ({ spaceId, user, channelId, channelName, dmId, handleTh
     }
 
     function formatDate(date) {
-        const dbDate = new Date(date);
-        const localTime = new Date(dbDate.getTime() - dbDate.getTimezoneOffset() * 60000);
-
-        const year = localTime.getFullYear();
-        const month = String(localTime.getMonth() + 1).padStart(2, '0');
-        const day = String(localTime.getDate()).padStart(2, '0');
-        const hours = localTime.getHours();
-        const minutes = String(localTime.getMinutes()).padStart(2, '0');
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = date.getHours();
+        const minutes = String(date.getMinutes()).padStart(2, '0');
         const ampm = hours >= 12 ? '오후' : '오전';
         const adjustedHours = hours % 12 || 12; // 0시를 12시로 변환
 
